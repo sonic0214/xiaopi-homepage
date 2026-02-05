@@ -3,9 +3,9 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "npx --no-install astro dev",
-    "build": "npx --no-install astro build",
-    "preview": "npx --no-install astro preview",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
