@@ -1,0 +1,11 @@
+[
+  {
+    "time": "2026-02-05T00:00:00+08:00",
+    "tag": "日报",
+    "text": "工作总结（简版）\n- fix(ci): call astro via node node_modules/astro/astro.js\n- ci: use npm install (work around npm ci bug on runners)\n- fix(ci): ensure dev deps installed; use astro binary in npm scripts\n- fix(ci): use local astro via npx --no-install\n- fix(ci): use npx astro in npm scripts for GitHub Actions\n- init: xiaopi homepage (Astro) + GitHub Pages deploy",
+    "meta": {
+      "mode": "heuristic",
+      "commits": 6
+    }
+  }
+]

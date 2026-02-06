@@ -1,0 +1,50 @@
+name: Daily Worklog Summary
+
+on:
+  schedule:
+    # 00:00 Asia/Shanghai (UTC+8) => 16:00 UTC
+    - cron: '0 16 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-worklog-summary
+  cancel-in-progress: false
+
+jobs:
+  summary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate daily summary (yesterday)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          # Optional override
+          OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+        run: |
+          node scripts/generate_daily_summary.mjs
+
+      - name: Commit & push (if changed)
+        run: |
+          if git diff --quiet; then
+            echo "No changes."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add src/data/worklog.daily.json
+          git commit -m "chore: daily worklog summary"
+          git push

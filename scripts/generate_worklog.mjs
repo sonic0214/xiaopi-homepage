@@ -20,7 +20,8 @@ function safeTag(msg) {
 let lines = '';
 try {
   // iso time, short sha, subject
-  lines = sh("git log -n 12 --date=iso-strict --pretty=format:%ad\t%h\t%s");
+  // NOTE: use %x09 for tabs; \t is not expanded in git pretty format.
+  lines = sh("git log -n 12 --date=iso-strict --pretty=format:%ad%x09%h%x09%s");
 } catch (e) {
   lines = '';
 }
@@ -39,13 +40,33 @@ for (const row of lines.split('\n')) {
   });
 }
 
+// Daily summaries (auto-committed)
+const dailyPath = path.join('src', 'data', 'worklog.daily.json');
+if (fs.existsSync(dailyPath)) {
+  try {
+    const daily = JSON.parse(fs.readFileSync(dailyPath, 'utf8'));
+    if (Array.isArray(daily)) {
+      // Show a few most recent daily summaries on top.
+      for (const it of daily.slice(0, 3)) {
+        if (!it || typeof it !== 'object') continue;
+        if (!it.text) continue;
+        items.unshift({
+          time: it.time || '最近',
+          tag: it.tag || '日报',
+          text: it.text,
+        });
+      }
+    }
+  } catch {}
+}
+
 // Optional manual public-safe items (committed)
 const manualPath = path.join('src', 'data', 'worklog.manual.json');
 if (fs.existsSync(manualPath)) {
   try {
     const manual = JSON.parse(fs.readFileSync(manualPath, 'utf8'));
     if (Array.isArray(manual)) {
-      for (const it of manual.slice(0, 6)) {
+      for (const it of manual.slice(0, 10)) {
         if (!it || typeof it !== 'object') continue;
         if (!it.text) continue;
         items.unshift({
