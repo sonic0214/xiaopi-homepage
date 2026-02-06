@@ -10,7 +10,7 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
     <span class="hint">像素老虎机（轻量 · 点击拉杆开转）</span>
   </div>
 
-  <div class="slot" data-pokeslot id={id} style={`--sprite-url: url('${asset('assets/pokeslot-sprite.svg')}')`}>
+  <div class="slot" data-pokeslot id={id} style={`--base: '${String(base).replace(/\/$/, '')}/'`}>
     <div class="machine" role="group" aria-label="宠物小精灵老虎机">
       <div class="marquee" aria-hidden="true">
         <div class="score">SCORE<br /><span>0088</span></div>
@@ -39,29 +39,35 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
         <span class="lamp"></span><span class="lamp"></span><span class="lamp"></span>
       </div>
 
-      <script type="module">
-        const root = document.getElementById({JSON.stringify(id)});
-        if (!root) throw new Error('pokeslot: root not found');
+      <script type="module" define:vars={{ id, base }}>
+        const root = document.getElementById(id);
+        if (!root) return;
 
         const ITEMS = [
-          { name: '皮卡丘', s: 0 }, { name: '伊布', s: 1 }, { name: '可达鸭', s: 2 },
-          { name: '妙蛙种子', s: 3 }, { name: '小火龙', s: 4 }, { name: '杰尼龟', s: 5 },
-          { name: '胖丁', s: 6 }, { name: '喵喵', s: 7 }, { name: '卡比兽', s: 8 },
-          { name: '耿鬼', s: 9 }, { name: '鲤鱼王', s: 10 }, { name: '超梦', s: 11 },
+          { name: '皮卡丘', slug: 'pikachu' },
+          { name: '伊布', slug: 'eevee' },
+          { name: '可达鸭', slug: 'psyduck' },
+          { name: '妙蛙种子', slug: 'bulbasaur' },
+          { name: '小火龙', slug: 'charmander' },
+          { name: '杰尼龟', slug: 'squirtle' },
+          { name: '胖丁', slug: 'jigglypuff' },
+          { name: '喵喵', slug: 'meowth' },
+          { name: '卡比兽', slug: 'snorlax' },
+          { name: '耿鬼', slug: 'gengar' },
+          { name: '鲤鱼王', slug: 'magikarp' },
+          { name: '超梦', slug: 'mewtwo' },
         ];
 
-        const itemH = 56;
+        const itemH = 56; // each symbol height
+
         const reels = Array.from(root.querySelectorAll('[data-reel]'));
         const lever = root.querySelector('[data-lever]');
         const result = root.querySelector('[data-result]');
 
         const setCell = (el, idx) => {
-          const s = ITEMS[idx].s;
-          const x = (s % 6) * 64;
-          const y = Math.floor(s / 6) * 64;
-          el.style.setProperty('--bx', `-${x}px`);
-          el.style.setProperty('--by', `-${y}px`);
-          el.setAttribute('aria-label', ITEMS[idx].name);
+          const it = ITEMS[idx];
+          el.style.setProperty('--icon', `url(${root.style.getPropertyValue('--base')}assets/pokeslot-icons/${it.slug}.png)`);
+          el.setAttribute('aria-label', it.name);
         };
 
         const buildStrip = (strip) => {
@@ -149,7 +155,7 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
 
   .machine{
     position:relative;
-    padding:14px;
+    padding:18px 18px 16px;
     border-radius:22px;
     border:1px solid rgba(0,0,0,.12);
     background:
@@ -158,6 +164,8 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
       linear-gradient(180deg, rgba(249,186,56,.55), rgba(233,125,74,.22));
     box-shadow:0 18px 55px rgba(0,0,0,.08);
     overflow:hidden;
+    max-width:720px;
+    margin:0 auto;
   }
 
   /* pixel-ish bezel */
@@ -195,11 +203,11 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
   .reels{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding-right:64px}
 
   .reelWindow{
-    height:64px;
-    border-radius:14px;
+    height:168px; /* show 3 symbols */
+    border-radius:16px;
     border:1px solid rgba(0,0,0,.18);
     background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.70));
-    box-shadow: inset 0 10px 18px rgba(0,0,0,.06);
+    box-shadow: inset 0 12px 22px rgba(0,0,0,.06);
     overflow:hidden;
     position:relative;
   }
@@ -207,14 +215,15 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
     content:"";
     position:absolute;inset:0;pointer-events:none;
     background:
-      linear-gradient(180deg, rgba(242,183,5,.14), transparent 42%),
-      linear-gradient(0deg, rgba(233,125,74,.10), transparent 55%);
-    opacity:.9;
+      linear-gradient(180deg, rgba(242,183,5,.14), transparent 32%),
+      linear-gradient(0deg, rgba(233,125,74,.10), transparent 40%),
+      linear-gradient(180deg, transparent 40%, rgba(0,0,0,.06) 50%, transparent 60%);
+    opacity:1;
   }
 
   .reelStrip{
     position:absolute;
-    left:0; top:4px;
+    left:0; top:0;
     width:100%;
     transform: translate3d(0, 0, 0);
     transition-property: transform;
@@ -228,20 +237,12 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
     display:flex;
     align-items:center;
     justify-content:center;
+    --icon: none;
+    background-image: var(--icon);
+    background-repeat:no-repeat;
+    background-position:center;
+    image-rendering: pixelated;
   }
-
-  /* Sprite icon (SVG) */
-  .reelCell{
-    --sprite: 0;
-    background-image: var(--sprite-url);
-    background-repeat: no-repeat;
-    background-size: 384px 128px;
-    background-position: calc(-64px * (var(--sprite) % 6)) calc(-64px * (floor(var(--sprite) / 6)));
-    /* Note: floor() not widely supported; fallback below via inline styles in JS (background-position) */
-  }
-
-  /* Fallback: use custom properties for x/y set by JS */
-  .reelCell{background-position: var(--bx, 0px) var(--by, 0px)}
 
   .controls{margin-top:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:22px}
   .slotResult{color:rgba(0,0,0,.64);font-size:13px;line-height:1.6}
