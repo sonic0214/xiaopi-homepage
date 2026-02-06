@@ -437,13 +437,24 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
   @media (max-width:640px){
     .slot{--symbolH: 96px; --iconSize: 96px;}
 
+    /* iPhone-like widths: make spacing more "auto" so nothing looks off-center */
+    .machine{
+      padding-left: calc(16px + env(safe-area-inset-left));
+      padding-right: calc(16px + env(safe-area-inset-right));
+    }
+
+    /* Make SCORE/WIN align with the cabinet width on mobile */
+    .marquee{gap:10px; padding:0 14px}
+    .score{flex:1; min-width:0}
+
     /* Mobile: keep the lever visible, hide side scales to free width */
     .sideScale{display:none}
 
-    /* Give the reels room and keep a visible lever inside the machine bounds */
-    .reels{padding:8px 72px 8px 14px; gap:10px}
+    /* Reserve space for lever on the right; keep left/right balance stable across iPhone 16 sizes */
+    .reels{padding:8px calc(14px + 66px + 10px) 8px 14px; gap:10px}
 
-    .lever{display:flex; right:10px; top:78px; width:66px; height:160px}
+    /* Center lever vertically to avoid “not aligned” feeling across tall screens */
+    .lever{display:flex; right:clamp(8px, 2.8vw, 12px); top:50%; transform: translateY(-50%); width:66px; height:160px}
     .leverRod{height:112px}
     .leverKnob{width:38px;height:38px}
   }
