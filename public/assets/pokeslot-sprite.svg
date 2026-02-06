@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="384" height="128" viewBox="0 0 384 128" shape-rendering="crispEdges">
+  <defs>
+    <style>
+      .o{opacity:.92}
+    </style>
+  </defs>
+
+  <!-- Each cell: 64x64. Grid: 6 columns x 2 rows. Minimal, original pixel icons (not official sprites). -->
+
+  <!-- 1) 皮卡丘-like (x=0,y=0) -->
+  <g transform="translate(0 0)">
+    <rect width="64" height="64" fill="none"/>
+    <g transform="translate(8 10)">
+      <rect x="10" y="2" width="6" height="10" fill="#f4d84b"/>
+      <rect x="30" y="2" width="6" height="10" fill="#f4d84b"/>
+      <rect x="8" y="10" width="32" height="26" fill="#f4d84b"/>
+      <rect x="12" y="14" width="6" height="6" fill="#1f1f1f"/>
+      <rect x="30" y="14" width="6" height="6" fill="#1f1f1f"/>
+      <rect x="16" y="30" width="18" height="4" fill="#d28b2d"/>
+      <rect x="4" y="22" width="6" height="6" fill="#ef5b6e" class="o"/>
+      <rect x="38" y="22" width="6" height="6" fill="#ef5b6e" class="o"/>
+      <rect x="40" y="28" width="10" height="6" fill="#f4d84b"/>
+      <rect x="48" y="26" width="6" height="10" fill="#d28b2d"/>
+    </g>
+  </g>
+
+  <!-- 2) 伊布-like (x=64,y=0) -->
+  <g transform="translate(64 0)">
+    <rect width="64" height="64" fill="none"/>
+    <g transform="translate(8 12)">
+      <rect x="8" y="6" width="32" height="26" fill="#b47a45"/>
+      <rect x="10" y="2" width="10" height="10" fill="#b47a45"/>
+      <rect x="28" y="2" width="10" height="10" fill="#b47a45"/>
+      <rect x="12" y="10" width="6" height="6" fill="#1f1f1f"/>
+      <rect x="30" y="10" width="6" height="6" fill="#1f1f1f"/>
+      <rect x="16" y="18" width="16" height="6" fill="#f4ead7"/>
+      <rect x="14" y="24" width="20" height="10" fill="#f4ead7"/>
+      <rect x="36" y="18" width="10" height="8" fill="#b47a45"/>
+    </g>
+  </g>
+
+  <!-- 3) 可达鸭-like (x=128,y=0) -->
+  <g transform="translate(128 0)">
+    <rect width="64" height="64" fill="none"/>
+    <g transform="translate(8 12)">
+      <rect x="10" y="4" width="30" height="26" fill="#f2d35a"/>
+      <rect x="14" y="2" width="6" height="6" fill="#1f1f1f"/>
+      <rect x="30" y="2" width="6" height="6" fill="#1f1f1f"/>
+      <rect x="18" y="16" width="14" height="10" fill="#e3a43b"/>
+      <rect x="22" y="10" width="6" height="6" fill="#ef5b6e" class="o"/>
+      <rect x="6" y="12" width="6" height="10" fill="#f2d35a"/>
+      <rect x="40" y="12" width="6" height="10" fill="#f2d35a"/>
+    </g>
+  </g>
+
+  <!-- 4) 妙蛙种子-like (x=192,y=0) -->
+  <g transform="translate(192 0)">
+    <rect width="64" height="64" fill="none"/>
+    <g transform="translate(8 14)">
+      <rect x="10" y="10" width="30" height="20" fill="#62c3a5"/>
+      <rect x="12" y="6" width="26" height="10" fill="#62c3a5"/>
+      <rect x="16" y="12" width="6" height="6" fill="#1f1f1f"/>
+      <rect x="28" y="12" width="6" height="6" fill="#1f1f1f"/>
+      <rect x="18" y="20" width="14" height="4" fill="#2a8d77"/>
+      <rect x="18" y="0" width="14" height="10" fill="#48a56f"/>
+      <rect x="16" y="2" width="18" height="6" fill="#3b8f5e" class="o"/>
+    </g>
+  </g>
+
+  <!-- 5) 小火龙-like (x=256,y=0) -->
+  <g transform="translate(256 0)">
+    <rect width="64" height="64" fill="none"/>
+    <g transform="translate(10 12)">
+      <rect x="8" y="8" width="26" height="24" fill="#f39a4a"/>
+      <rect x="12" y="14" width="6" height="6" fill="#1f1f1f"/>
+      <rect x="24" y="14" width="6" height="6" fill="#1f1f1f"/>
+      <rect x="16" y="22" width="12" height="4" fill="#f6d8bf"/>
+      <rect x="32" y="24" width="10" height="6" fill="#f39a4a"/>
+      <rect x="40" y="22" width="6" height="10" fill="#f05a3b"/>
+      <rect x="42" y="24" width="2" height="6" fill="#f4d84b"/>
+    </g>
+  </g>
+
+  <!-- 6) 杰尼龟-like (x=320,y=0) -->
+  <g transform="translate(320 0)">
+    <rect width="64" height="64" fill="none"/>
+    <g transform="translate(8 14)">
+      <rect x="10" y="10" width="30" height="18" fill="#6fb7e5"/>
+      <rect x="14" y="6" width="22" height="10" fill="#6fb7e5"/>
+      <rect x="16" y="12" width="6" height="6" fill="#1f1f1f"/>
+      <rect x="28" y="12" width="6" height="6" fill="#1f1f1f"/>
+      <rect x="18" y="20" width="14" height="4" fill="#f6d8bf"/>
+      <rect x="8" y="18" width="8" height="8" fill="#caa56a"/>
+      <rect x="34" y="18" width="8" height="8" fill="#caa56a"/>
+    </g>
+  </g>
+
+  <!-- 7) 胖丁-like (x=0,y=64) -->
+  <g transform="translate(0 64)">
+    <rect width="64" height="64" fill="none"/>
+    <g transform="translate(10 12)">
+      <rect x="6" y="10" width="28" height="22" fill="#f0a6c7"/>
+      <rect x="10" y="6" width="20" height="10" fill="#f0a6c7"/>
+      <rect x="12" y="14" width="6" height="6" fill="#1f1f1f"/>
+      <rect x="22" y="14" width="6" height="6" fill="#1f1f1f"/>
+      <rect x="16" y="22" width="8" height="4" fill="#ef5b6e" class="o"/>
+      <rect x="28" y="8" width="10" height="10" fill="#f0a6c7"/>
+    </g>
+  </g>
+
+  <!-- 8) 喵喵-like (x=64,y=64) -->
+  <g transform="translate(64 64)">
+    <rect width="64" height="64" fill="none"/>
+    <g transform="translate(8 12)">
+      <rect x="10" y="8" width="30" height="24" fill="#f1e0b5"/>
+      <rect x="12" y="4" width="10" height="10" fill="#f1e0b5"/>
+      <rect x="28" y="4" width="10" height="10" fill="#f1e0b5"/>
+      <rect x="22" y="2" width="6" height="6" fill="#f2b705"/>
+      <rect x="16" y="14" width="6" height="6" fill="#1f1f1f"/>
+      <rect x="28" y="14" width="6" height="6" fill="#1f1f1f"/>
+      <rect x="18" y="22" width="14" height="4" fill="#d28b2d"/>
+    </g>
+  </g>
+
+  <!-- 9) 卡比兽-like (x=128,y=64) -->
+  <g transform="translate(128 64)">
+    <rect width="64" height="64" fill="none"/>
+    <g transform="translate(8 12)">
+      <rect x="10" y="10" width="30" height="22" fill="#3a6fb4"/>
+      <rect x="14" y="14" width="22" height="18" fill="#f6d8bf"/>
+      <rect x="18" y="16" width="6" height="4" fill="#1f1f1f"/>
+      <rect x="26" y="16" width="6" height="4" fill="#1f1f1f"/>
+      <rect x="20" y="22" width="12" height="4" fill="#d28b2d"/>
+      <rect x="6" y="18" width="6" height="10" fill="#3a6fb4"/>
+      <rect x="40" y="18" width="6" height="10" fill="#3a6fb4"/>
+    </g>
+  </g>
+
+  <!-- 10) 耿鬼-like (x=192,y=64) -->
+  <g transform="translate(192 64)">
+    <rect width="64" height="64" fill="none"/>
+    <g transform="translate(8 12)">
+      <rect x="10" y="10" width="30" height="22" fill="#7a4bb3"/>
+      <rect x="12" y="6" width="10" height="10" fill="#7a4bb3"/>
+      <rect x="28" y="6" width="10" height="10" fill="#7a4bb3"/>
+      <rect x="16" y="16" width="6" height="6" fill="#ffffff"/>
+      <rect x="28" y="16" width="6" height="6" fill="#ffffff"/>
+      <rect x="18" y="24" width="14" height="4" fill="#1f1f1f"/>
+      <rect x="20" y="22" width="10" height="2" fill="#ef5b6e" class="o"/>
+    </g>
+  </g>
+
+  <!-- 11) 鲤鱼王-like (x=256,y=64) -->
+  <g transform="translate(256 64)">
+    <rect width="64" height="64" fill="none"/>
+    <g transform="translate(8 14)">
+      <rect x="10" y="12" width="30" height="16" fill="#f28b2f"/>
+      <rect x="14" y="8" width="8" height="8" fill="#f28b2f"/>
+      <rect x="30" y="10" width="10" height="10" fill="#f28b2f"/>
+      <rect x="22" y="16" width="6" height="6" fill="#1f1f1f"/>
+      <rect x="38" y="16" width="6" height="6" fill="#f05a3b" class="o"/>
+      <rect x="6" y="16" width="6" height="8" fill="#f2b705"/>
+    </g>
+  </g>
+
+  <!-- 12) 超梦-like (x=320,y=64) -->
+  <g transform="translate(320 64)">
+    <rect width="64" height="64" fill="none"/>
+    <g transform="translate(8 10)">
+      <rect x="16" y="6" width="18" height="26" fill="#d7c8f5"/>
+      <rect x="14" y="10" width="6" height="10" fill="#d7c8f5"/>
+      <rect x="30" y="10" width="6" height="10" fill="#d7c8f5"/>
+      <rect x="20" y="14" width="4" height="4" fill="#1f1f1f"/>
+      <rect x="28" y="14" width="4" height="4" fill="#1f1f1f"/>
+      <rect x="22" y="22" width="8" height="3" fill="#a985e6"/>
+      <rect x="34" y="22" width="10" height="10" fill="#a985e6" class="o"/>
+    </g>
+  </g>
+</svg>

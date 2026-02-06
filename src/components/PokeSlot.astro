@@ -5,78 +5,164 @@ const id = `poke-slot-${Math.random().toString(16).slice(2)}`;
 <section class="section" aria-label="Poke Slot">
   <div class="sectionTitle">
     <h2>POKE SLOT</h2>
-    <span class="hint">像素风小老虎机（点击拉杆开转）</span>
+    <span class="hint">像素老虎机（轻量 · 点击拉杆开转）</span>
   </div>
 
   <div class="slot" data-slot id={id}>
-    <div class="slotFrame" role="group" aria-label="宠物小精灵老虎机">
-      <div class="reels" aria-hidden="true">
-        <div class="reel" data-reel="0"><span class="reelText">皮卡丘</span></div>
-        <div class="reel" data-reel="1"><span class="reelText">伊布</span></div>
-        <div class="reel" data-reel="2"><span class="reelText">可达鸭</span></div>
+    <div class="machine" role="group" aria-label="宠物小精灵老虎机">
+      <div class="marquee" aria-hidden="true">
+        <div class="score">SCORE<br /><span>0088</span></div>
+        <div class="score">WIN<br /><span>0000</span></div>
       </div>
 
-      <div class="lever" aria-hidden="true">
-        <div class="leverRod"></div>
-        <div class="leverKnob"></div>
-      </div>
+      <div class="cabinet">
+        <div class="reels" aria-hidden="true">
+          <div class="reel" data-reel="0"><div class="reelWindow"><div class="reelStrip"></div></div></div>
+          <div class="reel" data-reel="1"><div class="reelWindow"><div class="reelStrip"></div></div></div>
+          <div class="reel" data-reel="2"><div class="reelWindow"><div class="reelStrip"></div></div></div>
+        </div>
 
-      <div class="slotMeta">
-        <div class="slotActions">
+        <div class="lever" aria-hidden="true">
+          <div class="leverRod"></div>
+          <div class="leverKnob"></div>
+        </div>
+
+        <div class="controls">
           <button class="slotBtn" data-spin type="button">拉杆</button>
           <div class="slotResult" data-result aria-live="polite"></div>
         </div>
       </div>
+
+      <div class="lights" aria-hidden="true">
+        <span class="lamp"></span><span class="lamp"></span><span class="lamp"></span>
+        <span class="lamp"></span><span class="lamp"></span><span class="lamp"></span>
+      </div>
+
+      <script type="module" define:vars={{ id }}>
+        const root = document.getElementById(id);
+        const btn = root?.querySelector('[data-spin]');
+
+        let mod;
+        btn?.addEventListener('click', async () => {
+          if (!root || !btn) return;
+          if (!mod) {
+            mod = await import('../scripts/slot-machine.ts');
+            mod.initSlotMachine(root);
+          }
+          mod.spinOnce(root);
+        });
+      </script>
     </div>
-
-    <script type="module" define:vars={{ id }}>
-      const root = document.getElementById(id);
-      const btn = root?.querySelector('[data-spin]');
-
-      // Lazy-load game logic on first click; and make the first click spin too.
-      let mod;
-      btn?.addEventListener('click', async () => {
-        if (!root || !btn) return;
-        if (!mod) {
-          mod = await import('../scripts/slot-machine.ts');
-          mod.initSlotMachine(root);
-        }
-        mod.spinOnce(root);
-      });
-    </script>
   </div>
 </section>
 
 <style>
+  /* Entire machine is self-contained so styles always apply */
   .slot{margin-top:4px}
-  .slotFrame{position:relative;padding:16px;border-radius:18px;background:var(--card);border:1px solid var(--stroke);
-    box-shadow:0 10px 32px rgba(0,0,0,.05);
-  }
-  .reels{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-right:64px}
-  .reel{height:64px;border-radius:14px;border:1px solid rgba(0,0,0,.12);
-    background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.70));
-    display:flex;align-items:center;justify-content:center;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    letter-spacing:.06em;
+
+  .machine{
     position:relative;
+    padding:14px;
+    border-radius:22px;
+    border:1px solid rgba(0,0,0,.12);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.25)),
+      radial-gradient(1200px 480px at 50% 0%, rgba(242,183,5,.18), transparent 60%),
+      linear-gradient(180deg, rgba(249,186,56,.55), rgba(233,125,74,.22));
+    box-shadow:0 18px 55px rgba(0,0,0,.08);
     overflow:hidden;
   }
-  .reel::before{content:"";position:absolute;inset:0;pointer-events:none;
+
+  /* pixel-ish bezel */
+  .cabinet{
+    position:relative;
+    border-radius:18px;
+    border:1px solid rgba(0,0,0,.14);
     background:
-      linear-gradient(180deg, rgba(242,183,5,.12), transparent 45%),
+      linear-gradient(180deg, rgba(247,170,36,.52), rgba(245,132,66,.20));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.45);
+    padding:14px 14px 12px;
+  }
+
+  .marquee{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    margin:2px 0 10px;
+  }
+  .score{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    text-align:center;
+    padding:8px 10px;
+    border-radius:14px;
+    background:rgba(0,0,0,.55);
+    color:rgba(255,255,255,.9);
+    border:1px solid rgba(255,255,255,.10);
+    line-height:1.05;
+    font-size:12px;
+    letter-spacing:.08em;
+    min-width:92px;
+  }
+  .score span{display:block;margin-top:6px;font-size:18px;letter-spacing:.12em}
+
+  .reels{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding-right:64px}
+
+  .reelWindow{
+    height:64px;
+    border-radius:14px;
+    border:1px solid rgba(0,0,0,.18);
+    background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.70));
+    box-shadow: inset 0 10px 18px rgba(0,0,0,.06);
+    overflow:hidden;
+    position:relative;
+  }
+  .reelWindow::before{
+    content:"";
+    position:absolute;inset:0;pointer-events:none;
+    background:
+      linear-gradient(180deg, rgba(242,183,5,.14), transparent 42%),
       linear-gradient(0deg, rgba(233,125,74,.10), transparent 55%);
     opacity:.9;
   }
-  .reelText{position:relative;z-index:1;font-size:14px;color:#1f1f1f}
 
-  .slotMeta{margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-  .slotActions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .reelStrip{
+    position:absolute;
+    left:0; top:4px;
+    width:100%;
+    transform: translate3d(0, 0, 0);
+    transition-property: transform;
+    transition-timing-function: cubic-bezier(.16,.84,.18,1);
+    will-change: transform;
+  }
 
-  .slotBtn{appearance:none;border:1px solid rgba(0,0,0,.14);background:rgba(255,255,255,.70);
-    padding:10px 14px;border-radius:14px;font-weight:600;color:#222;cursor:pointer;
+  /* Each cell is 56px tall, centered */
+  .reelCell{
+    height:56px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* Sprite icon (SVG) */
+  .reelCell{
+    --sprite: 0;
+    background-image: url('assets/pokeslot-sprite.svg');
+    background-repeat: no-repeat;
+    background-size: 384px 128px;
+    background-position: calc(-64px * (var(--sprite) % 6)) calc(-64px * (floor(var(--sprite) / 6)));
+    /* Note: floor() not widely supported; fallback below via inline styles in JS (background-position) */
+  }
+
+  /* Fallback: use custom properties for x/y set by JS */
+  .reelCell{background-position: var(--bx, 0px) var(--by, 0px)}
+
+  .controls{margin-top:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .slotBtn{
+    appearance:none;border:1px solid rgba(0,0,0,.16);background:rgba(255,255,255,.74);
+    padding:10px 14px;border-radius:14px;font-weight:700;color:#222;cursor:pointer;
     transition: transform .12s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
   }
-  .slotBtn:hover{transform: translateY(-1px);border-color: rgba(242,183,5,.60);background:rgba(255,255,255,.92);
+  .slotBtn:hover{transform: translateY(-1px);border-color: rgba(242,183,5,.62);background:rgba(255,255,255,.94);
     box-shadow:0 14px 30px rgba(0,0,0,.07);
   }
   .slotBtn:active{transform: translateY(0px) scale(.99)}
@@ -84,31 +170,44 @@ const id = `poke-slot-${Math.random().toString(16).slice(2)}`;
   .slotBtn:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(242,183,5,.18), 0 14px 30px rgba(0,0,0,.07);
     border-color: rgba(242,183,5,.65);
   }
-  .slotResult{color:var(--muted);font-size:13px;line-height:1.6}
+  .slotResult{color:rgba(0,0,0,.64);font-size:13px;line-height:1.6}
 
   /* Lever */
-  .lever{position:absolute;right:14px;top:18px;width:44px;height:92px;display:flex;align-items:flex-start;justify-content:center}
-  .leverRod{width:10px;height:62px;border-radius:999px;background:rgba(0,0,0,.12);border:1px solid rgba(0,0,0,.10);
+  .lever{position:absolute;right:14px;top:16px;width:44px;height:104px;display:flex;align-items:flex-start;justify-content:center}
+  .leverRod{width:10px;height:72px;border-radius:999px;background:rgba(0,0,0,.14);border:1px solid rgba(0,0,0,.10);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
     transform-origin: top center;
     transition: transform .18s ease;
   }
-  .leverKnob{margin-top:-10px;width:28px;height:28px;border-radius:50%;
-    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(255,255,255,.20)),
-      radial-gradient(circle at 55% 55%, rgba(242,183,5,.90), rgba(233,125,74,.55));
+  .leverKnob{margin-top:-12px;width:28px;height:28px;border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.96), rgba(255,255,255,.25)),
+      radial-gradient(circle at 55% 55%, rgba(242,183,5,.92), rgba(233,125,74,.55));
     border:1px solid rgba(0,0,0,.12);
     box-shadow:0 10px 18px rgba(0,0,0,.10);
     transform-origin: top center;
     transition: transform .18s ease;
   }
 
-  .slot.isSpinning .reel{border-color: rgba(233,125,74,.45)}
-  .slot.isSpinning .leverRod{transform: rotate(18deg) translateY(6px)}
-  .slot.isSpinning .leverKnob{transform: translateY(10px)}
+  .slot.isSpinning .reelWindow{border-color: rgba(233,125,74,.45)}
+  .slot.isSpinning .leverRod{transform: rotate(16deg) translateY(6px)}
+  .slot.isSpinning .leverKnob{transform: translateY(12px)}
 
-  .slot.isJackpot .reel{border-color: rgba(242,183,5,.75); box-shadow: 0 0 0 4px rgba(242,183,5,.14) inset;}
+  .slot.isJackpot .reelWindow{border-color: rgba(242,183,5,.82); box-shadow: 0 0 0 4px rgba(242,183,5,.12) inset, inset 0 10px 18px rgba(0,0,0,.06);}
+  .slot.isJackpot .cabinet{box-shadow: inset 0 1px 0 rgba(255,255,255,.45), 0 0 0 4px rgba(242,183,5,.14)}
 
+  /* Lights */
+  .lights{display:flex;gap:8px;justify-content:center;margin-top:10px;opacity:.9}
+  .lamp{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.65);border:1px solid rgba(0,0,0,.10)}
+  .slot.isSpinning .lamp{animation: blink .28s linear infinite}
+  .slot.isJackpot .lamp{animation: blink .14s linear infinite}
+  @keyframes blink{0%{opacity:.45}50%{opacity:1}100%{opacity:.45}}
+
+  @media (max-width:640px){
+    .reels{padding-right:0}
+    .lever{display:none}
+  }
   @media (prefers-reduced-motion: reduce){
-    .slotBtn, .reel, .leverRod, .leverKnob{transition:none}
+    .slotBtn, .leverRod, .leverKnob, .reelStrip{transition:none}
+    .slot.isSpinning .lamp{animation:none}
   }
 </style>
