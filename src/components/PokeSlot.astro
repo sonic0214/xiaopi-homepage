@@ -5,7 +5,7 @@ const id = `poke-slot-${Math.random().toString(16).slice(2)}`;
 <section class="section" aria-label="Poke Slot">
   <div class="sectionTitle">
     <h2>POKE SLOT</h2>
-    <span class="hint">像素风小老虎机（点了才加载脚本）</span>
+    <span class="hint">像素风小老虎机（点击拉杆开转）</span>
   </div>
 
   <div class="slot" data-slot id={id}>
@@ -16,6 +16,11 @@ const id = `poke-slot-${Math.random().toString(16).slice(2)}`;
         <div class="reel" data-reel="2"><span class="reelText">可达鸭</span></div>
       </div>
 
+      <div class="lever" aria-hidden="true">
+        <div class="leverRod"></div>
+        <div class="leverKnob"></div>
+      </div>
+
       <div class="slotMeta">
         <div class="slotActions">
           <button class="slotBtn" data-spin type="button">拉杆</button>
@@ -24,21 +29,86 @@ const id = `poke-slot-${Math.random().toString(16).slice(2)}`;
       </div>
     </div>
 
-    <script type="module">
-      const root = document.getElementById({JSON.stringify(id)});
+    <script type="module" define:vars={{ id }}>
+      const root = document.getElementById(id);
       const btn = root?.querySelector('[data-spin]');
 
-      // Lazy-load game logic only on first interaction.
-      let loaded;
+      // Lazy-load game logic on first click; and make the first click spin too.
+      let mod;
       btn?.addEventListener('click', async () => {
-        if (!loaded) {
-          loaded = import('../scripts/slot-machine.ts').then((m) => {
-            m.initSlotMachine(root);
-            return true;
-          });
-          await loaded;
+        if (!root || !btn) return;
+        if (!mod) {
+          mod = await import('../scripts/slot-machine.ts');
+          mod.initSlotMachine(root);
         }
-      }, { once: true });
+        mod.spinOnce(root);
+      });
     </script>
   </div>
 </section>
+
+<style>
+  .slot{margin-top:4px}
+  .slotFrame{position:relative;padding:16px;border-radius:18px;background:var(--card);border:1px solid var(--stroke);
+    box-shadow:0 10px 32px rgba(0,0,0,.05);
+  }
+  .reels{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-right:64px}
+  .reel{height:64px;border-radius:14px;border:1px solid rgba(0,0,0,.12);
+    background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.70));
+    display:flex;align-items:center;justify-content:center;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    letter-spacing:.06em;
+    position:relative;
+    overflow:hidden;
+  }
+  .reel::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      linear-gradient(180deg, rgba(242,183,5,.12), transparent 45%),
+      linear-gradient(0deg, rgba(233,125,74,.10), transparent 55%);
+    opacity:.9;
+  }
+  .reelText{position:relative;z-index:1;font-size:14px;color:#1f1f1f}
+
+  .slotMeta{margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .slotActions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+
+  .slotBtn{appearance:none;border:1px solid rgba(0,0,0,.14);background:rgba(255,255,255,.70);
+    padding:10px 14px;border-radius:14px;font-weight:600;color:#222;cursor:pointer;
+    transition: transform .12s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+  }
+  .slotBtn:hover{transform: translateY(-1px);border-color: rgba(242,183,5,.60);background:rgba(255,255,255,.92);
+    box-shadow:0 14px 30px rgba(0,0,0,.07);
+  }
+  .slotBtn:active{transform: translateY(0px) scale(.99)}
+  .slotBtn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+  .slotBtn:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(242,183,5,.18), 0 14px 30px rgba(0,0,0,.07);
+    border-color: rgba(242,183,5,.65);
+  }
+  .slotResult{color:var(--muted);font-size:13px;line-height:1.6}
+
+  /* Lever */
+  .lever{position:absolute;right:14px;top:18px;width:44px;height:92px;display:flex;align-items:flex-start;justify-content:center}
+  .leverRod{width:10px;height:62px;border-radius:999px;background:rgba(0,0,0,.12);border:1px solid rgba(0,0,0,.10);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
+    transform-origin: top center;
+    transition: transform .18s ease;
+  }
+  .leverKnob{margin-top:-10px;width:28px;height:28px;border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(255,255,255,.20)),
+      radial-gradient(circle at 55% 55%, rgba(242,183,5,.90), rgba(233,125,74,.55));
+    border:1px solid rgba(0,0,0,.12);
+    box-shadow:0 10px 18px rgba(0,0,0,.10);
+    transform-origin: top center;
+    transition: transform .18s ease;
+  }
+
+  .slot.isSpinning .reel{border-color: rgba(233,125,74,.45)}
+  .slot.isSpinning .leverRod{transform: rotate(18deg) translateY(6px)}
+  .slot.isSpinning .leverKnob{transform: translateY(10px)}
+
+  .slot.isJackpot .reel{border-color: rgba(242,183,5,.75); box-shadow: 0 0 0 4px rgba(242,183,5,.14) inset;}
+
+  @media (prefers-reduced-motion: reduce){
+    .slotBtn, .reel, .leverRod, .leverKnob{transition:none}
+  }
+</style>

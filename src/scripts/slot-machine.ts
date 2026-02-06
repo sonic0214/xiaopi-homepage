@@ -31,14 +31,20 @@ function sleep(ms: number) {
   return new Promise((res) => setTimeout(res, ms));
 }
 
-export function initSlotMachine(root: HTMLElement) {
+let BUSY = false;
+
+async function spin(root: HTMLElement) {
+  if (BUSY) return;
+
   const reels = Array.from(root.querySelectorAll<HTMLElement>('[data-reel]'));
   const btn = root.querySelector<HTMLButtonElement>('[data-spin]');
   const result = root.querySelector<HTMLElement>('[data-result]');
-
   if (!reels.length || !btn) return;
 
-  let busy = false;
+  BUSY = true;
+  btn.disabled = true;
+  root.classList.add('isSpinning');
+
   const setReel = (idx: number, text: string) => {
     const el = reels[idx]?.querySelector<HTMLElement>('.reelText');
     if (el) el.textContent = text;
@@ -48,42 +54,44 @@ export function initSlotMachine(root: HTMLElement) {
     if (result) result.textContent = text;
   };
 
-  setResult('');
+  // quick "tick" effect by swapping text rapidly, then settle each reel with a slight delay
+  const final: SlotItem[] = [pick(), pick(), pick()];
 
-  btn.addEventListener('click', async () => {
-    if (busy) return;
-    busy = true;
-    btn.disabled = true;
-    root.classList.add('isSpinning');
+  const tick = async (reelIdx: number, ms: number) => {
+    const endAt = Date.now() + ms;
+    while (Date.now() < endAt) {
+      setReel(reelIdx, pick().name);
+      await sleep(60);
+    }
+    setReel(reelIdx, final[reelIdx].name);
+  };
 
-    // quick "tick" effect by swapping text rapidly, then settle each reel with a slight delay
-    const final: SlotItem[] = [pick(), pick(), pick()];
+  await tick(0, 520);
+  await tick(1, 620);
+  await tick(2, 720);
 
-    const tick = async (reelIdx: number, ms: number) => {
-      const endAt = Date.now() + ms;
-      while (Date.now() < endAt) {
-        setReel(reelIdx, pick().name);
-        await sleep(60);
-      }
-      setReel(reelIdx, final[reelIdx].name);
-    };
+  root.classList.remove('isSpinning');
 
-    await tick(0, 520);
-    await tick(1, 620);
-    await tick(2, 720);
+  const [a, b, c] = final.map((x) => x.name);
+  const jackpot = a === b && b === c;
+  setResult(jackpot ? `命中！${a} 三连` : `结果：${a} / ${b} / ${c}`);
 
-    root.classList.remove('isSpinning');
+  root.classList.toggle('isJackpot', jackpot);
+  await sleep(900);
+  root.classList.remove('isJackpot');
 
-    const [a, b, c] = final.map((x) => x.name);
-    const jackpot = a === b && b === c;
-    setResult(jackpot ? `命中！${a} 三连` : `结果：${a} / ${b} / ${c}`);
+  btn.disabled = false;
+  BUSY = false;
+}
 
-    // small sparkle class when jackpot
-    root.classList.toggle('isJackpot', jackpot);
-    await sleep(900);
-    root.classList.remove('isJackpot');
+export function initSlotMachine(root: HTMLElement) {
+  const btn = root.querySelector<HTMLButtonElement>('[data-spin]');
+  const result = root.querySelector<HTMLElement>('[data-result]');
+  if (result) result.textContent = '';
+  btn?.addEventListener('click', () => spin(root));
+}
 
-    btn.disabled = false;
-    busy = false;
-  });
+// For lazy loader: make the very first click spin immediately.
+export function spinOnce(root: HTMLElement) {
+  return spin(root);
 }
