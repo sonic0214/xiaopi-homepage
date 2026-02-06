@@ -76,9 +76,12 @@ const capabilityCards = [
       }
       *{box-sizing:border-box}
       body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
-        background:radial-gradient(1200px 600px at 20% 10%, rgba(242,183,5,.18), transparent 60%),
-                   radial-gradient(1000px 500px at 80% 0%, rgba(233,125,74,.12), transparent 55%),
-                   linear-gradient(180deg,var(--bg1),var(--bg2));
+        /* soften side boundaries: use larger, feathered gradients + subtle center wash */
+        background:
+          radial-gradient(1400px 760px at 18% 12%, rgba(242,183,5,.16), transparent 72%),
+          radial-gradient(1400px 760px at 82% 10%, rgba(233,125,74,.11), transparent 72%),
+          radial-gradient(1000px 520px at 50% 0%, rgba(255,255,255,.35), transparent 60%),
+          linear-gradient(180deg,var(--bg1),var(--bg2));
         color:var(--text);
       }
       .wrap{max-width:1020px;margin:0 auto;padding:0 20px 72px;}
@@ -87,10 +90,11 @@ const capabilityCards = [
       .heroScreen{position:relative;min-height:100vh;display:flex;align-items:center;padding:72px 0 40px;}
       .heroScreen::before{content:"";position:absolute;inset:0;pointer-events:none;
         background:
-          radial-gradient(900px 460px at 14% 8%, rgba(242,183,5,.18), transparent 60%),
-          radial-gradient(860px 520px at 82% 10%, rgba(233,125,74,.12), transparent 62%),
-          radial-gradient(900px 520px at 55% 85%, rgba(49,194,106,.06), transparent 65%);
-        opacity:.9;
+          radial-gradient(1200px 720px at 18% 10%, rgba(242,183,5,.12), transparent 74%),
+          radial-gradient(1200px 720px at 82% 8%, rgba(233,125,74,.09), transparent 74%),
+          radial-gradient(1200px 720px at 50% 85%, rgba(49,194,106,.05), transparent 76%),
+          radial-gradient(900px 520px at 50% 20%, rgba(255,255,255,.28), transparent 70%);
+        opacity:1;
       }
       .hero{position:relative;width:100%;
         padding:0;border-radius:0;background:transparent;border:none;box-shadow:none;backdrop-filter:none;
@@ -106,12 +110,15 @@ const capabilityCards = [
       .kicker{color:#6b6b6b;font-size:12px;letter-spacing:.14em}
 
       .heroMain{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:34px;align-items:center}
-      .heroText{min-width:0}
+      /* center the intro block a bit more (like xiaomo.dev) */
+      .heroText{min-width:0;max-width:640px;margin:0 auto;}
+      .heroTop{max-width:860px;margin-left:auto;margin-right:auto;}
+      .heroMain{max-width:860px;margin-left:auto;margin-right:auto;}
       h1{margin:0;font-size:46px;letter-spacing:.4px;line-height:1.08}
       .tagline{margin:12px 0 0 0;font-size:16px;line-height:1.95;color:#2d2d2d}
       .subtitle{white-space:pre-line;margin:8px 0 0 0;color:var(--muted);line-height:1.95}
 
-      .heroMedia{display:flex;justify-content:flex-end}
+      .heroMedia{display:flex;justify-content:flex-end;}
       .avatar{width:210px;height:210px;border-radius:34px;object-fit:cover;border:1px solid rgba(0,0,0,.12);
         box-shadow:0 22px 70px rgba(0,0,0,.11);
         transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, filter .18s ease;}
@@ -167,6 +174,8 @@ const capabilityCards = [
       @media (max-width:920px){.grid{grid-template-columns:repeat(2,1fr)} .time{min-width:96px} .heroMain{grid-template-columns:1fr;}
         .heroMedia{justify-content:flex-start}
         .heroTop{flex-wrap:wrap;gap:10px}
+        .heroTop,.heroMain{max-width:100%}
+        .heroText{max-width:100%;margin:0}
       }
       @media (max-width:640px){
         .avatar{width:144px;height:144px}
