@@ -41,7 +41,9 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
 
       <script type="module" define:vars={{ id, base }}>
         const root = document.getElementById(id);
-        if (!root) return;
+        if (!root) {
+          console.warn('pokeslot: root not found', id);
+        } else {
 
         const ITEMS = [
           { name: '皮卡丘', slug: 'pikachu' },
@@ -144,6 +146,7 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
         };
 
         lever?.addEventListener('click', spin);
+      }
       </script>
     </div>
   </div>
