@@ -96,25 +96,48 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
         let credit = 20;
         let winThis = 0;
 
+        const setLeverEnabled = (enabled) => {
+          if (!lever) return;
+          lever.toggleAttribute('disabled', !enabled);
+        };
+
         const renderScore = () => {
           if (scoreEl) scoreEl.textContent = pad4(credit);
           if (winEl) winEl.textContent = pad4(winThis);
-          if (lever) lever.toggleAttribute('disabled', credit <= 0);
+          setLeverEnabled(credit > 0);
         };
 
         renderScore();
 
+        // Preload & decode icons to prevent end-of-spin jank.
+        const basePath = (root.style.getPropertyValue('--base') || '/').trim();
+        const iconUrls = ITEMS.map((it) => `${basePath}assets/pokeslot-icons/${it.slug}.png`);
+        setLeverEnabled(false);
+        Promise.all(
+          iconUrls.map((u) => {
+            const img = new Image();
+            img.decoding = 'async';
+            img.loading = 'eager';
+            img.src = u;
+            // decode() isn't supported everywhere; fallback to onload.
+            return (img.decode ? img.decode().catch(() => undefined) : new Promise((res) => (img.onload = () => res(undefined))));
+          })
+        )
+          .catch(() => undefined)
+          .finally(() => {
+            setLeverEnabled(credit > 0);
+          });
+
         const setCell = (el, idx) => {
           const it = ITEMS[idx];
-          const basePath = (root.style.getPropertyValue('--base') || '/').trim();
           const url = `${basePath}assets/pokeslot-icons/${it.slug}.png`;
-          // Inline styles so dynamically-created cells always render (Astro scoped CSS won't match them).
+          // Inline styles so dynamically-created cells always render.
           el.style.backgroundImage = `url(${url})`;
           el.style.backgroundRepeat = 'no-repeat';
           el.style.backgroundPosition = 'center';
           el.style.backgroundSize = `${iconSize}px ${iconSize}px`;
           el.style.imageRendering = 'pixelated';
-          el.style.filter = 'drop-shadow(0 6px 10px rgba(0,0,0,.10))';
+          el.style.filter = 'none';
           el.setAttribute('aria-label', it.name);
         };
 
@@ -328,6 +351,9 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
       linear-gradient(180deg, transparent 40%, rgba(0,0,0,.06) 50%, transparent 60%);
     opacity:1;
   }
+
+  /* Softer, cheaper depth: shadow only on the window, not on every symbol */
+  .reelWindow{filter: drop-shadow(0 10px 22px rgba(0,0,0,.08))}
 
   .reelStrip{
     position:absolute;
