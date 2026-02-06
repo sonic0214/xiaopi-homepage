@@ -18,6 +18,9 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
       </div>
 
       <div class="cabinet">
+        <canvas class="fx" data-fx aria-hidden="true"></canvas>
+        <div class="jackpotBanner" aria-hidden="true">欧皇降临</div>
+
         <div class="sideScale left" aria-hidden="true">
           <span class="badge b3">3</span>
           <span class="badge b2">2</span>
@@ -87,6 +90,122 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
         const result = root.querySelector('[data-result]');
         const scoreEl = root.querySelector('[data-score]');
         const winEl = root.querySelector('[data-win]');
+        const fx = root.querySelector('[data-fx]');
+
+        const reducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        const celebrate = (accentSlug) => {
+          try {
+            root.classList.add('isCelebrate');
+
+            if (reducedMotion || !fx) return;
+            const ctx = fx.getContext('2d');
+            if (!ctx) return;
+
+            const r = fx.getBoundingClientRect();
+            const dpr = Math.min(3, window.devicePixelRatio || 1);
+            fx.width = Math.max(1, Math.floor(r.width * dpr));
+            fx.height = Math.max(1, Math.floor(r.height * dpr));
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            const W = r.width;
+            const H = r.height;
+            const cx = W * 0.52;
+            const cy = H * 0.46;
+
+            const palette = {
+              gold: '#F2B705',
+              ember: '#E97D4A',
+              mint: '#8CF0B4',
+              sky: '#78D2FF',
+              white: 'rgba(255,255,255,.92)',
+            };
+            // slight variation per icon
+            const accent = accentSlug === 'gengar' ? '#9B7BFF'
+              : accentSlug === 'mewtwo' ? '#B6A2FF'
+              : accentSlug === 'pikachu' ? '#FFD34D'
+              : palette.gold;
+
+            const particles = [];
+            const burstN = 56;
+            for (let i = 0; i < burstN; i++) {
+              const a = (Math.PI * 2 * i) / burstN + (Math.random() - 0.5) * 0.18;
+              const sp = 2.6 + Math.random() * 4.2;
+              particles.push({
+                x: cx,
+                y: cy,
+                vx: Math.cos(a) * sp,
+                vy: Math.sin(a) * sp,
+                g: 0.12 + Math.random() * 0.10,
+                r: 2 + Math.random() * 3,
+                life: 780 + Math.random() * 320,
+                t: 0,
+                c: i % 5 === 0 ? accent : (i % 3 === 0 ? palette.ember : palette.gold),
+              });
+            }
+
+            const t0 = performance.now();
+            const DUR = 1100;
+            const draw = (now) => {
+              const t = now - t0;
+              ctx.clearRect(0, 0, W, H);
+
+              // glow rings
+              const p = Math.min(1, t / DUR);
+              for (let k = 0; k < 2; k++) {
+                const rr = 20 + (k * 18) + p * (130 + k * 40);
+                ctx.globalAlpha = (1 - p) * (k === 0 ? 0.55 : 0.28);
+                ctx.strokeStyle = k === 0 ? accent : palette.gold;
+                ctx.lineWidth = k === 0 ? 6 : 3;
+                ctx.beginPath();
+                ctx.arc(cx, cy, rr, 0, Math.PI * 2);
+                ctx.stroke();
+              }
+
+              // star burst lines
+              ctx.globalAlpha = Math.max(0, 0.55 - p * 0.4);
+              ctx.strokeStyle = palette.white;
+              ctx.lineWidth = 2;
+              for (let i = 0; i < 16; i++) {
+                const a = (Math.PI * 2 * i) / 16;
+                const len = 36 + p * 120;
+                ctx.beginPath();
+                ctx.moveTo(cx + Math.cos(a) * 18, cy + Math.sin(a) * 18);
+                ctx.lineTo(cx + Math.cos(a) * len, cy + Math.sin(a) * len);
+                ctx.stroke();
+              }
+
+              // particles
+              for (const pt of particles) {
+                pt.t += 16.6;
+                const alive = pt.t < pt.life;
+                if (!alive) continue;
+                pt.vy += pt.g;
+                pt.x += pt.vx;
+                pt.y += pt.vy;
+                const alpha = Math.max(0, 1 - pt.t / pt.life);
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = pt.c;
+                ctx.beginPath();
+                if (ctx.roundRect) {
+                  ctx.roundRect(pt.x, pt.y, pt.r * 1.2, pt.r * 2.6, 2);
+                } else {
+                  ctx.rect(pt.x, pt.y, pt.r * 1.2, pt.r * 2.6);
+                }
+                ctx.fill();
+              }
+
+              if (t < DUR) {
+                requestAnimationFrame(draw);
+              } else {
+                ctx.clearRect(0, 0, W, H);
+              }
+            };
+            requestAnimationFrame(draw);
+          } catch (_) {
+            // ignore
+          }
+        };
 
         // --- Scoring (slot-like) ---
         // CREDIT (SCORE): starts at 20, each spin costs 1.
@@ -296,9 +415,16 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
             ? `命中！${middleNames[0]} 三连 +${winThis}`
             : `结果：${middleNames[0]} / ${middleNames[1]} / ${middleNames[2]}（未中奖）`;
 
-          root.classList.toggle('isJackpot', jackpot);
-          await sleep(900);
-          root.classList.remove('isJackpot');
+          if (jackpot) {
+            root.classList.add('isJackpot');
+            celebrate(middleSlugs[0]);
+            await sleep(1200);
+            root.classList.remove('isJackpot');
+            root.classList.remove('isCelebrate');
+          } else {
+            root.classList.remove('isJackpot');
+            root.classList.remove('isCelebrate');
+          }
 
           busy = false;
         };
@@ -339,6 +465,49 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
     box-shadow: inset 0 1px 0 rgba(255,255,255,.45);
     padding:14px 14px 12px;
   }
+
+  /* Celebration FX */
+  .fx{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; opacity:0; transition: opacity .14s ease; mix-blend-mode: screen;}
+  .slot.isCelebrate .fx{opacity:1}
+
+  .jackpotBanner{
+    position:absolute;
+    left:50%;
+    top:10px;
+    transform: translateX(-50%) scale(.98);
+    padding:6px 12px;
+    border-radius:999px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-weight:900;
+    letter-spacing:.18em;
+    font-size:12px;
+    color:rgba(255,255,255,.92);
+    border:1px solid rgba(255,255,255,.16);
+    background:
+      radial-gradient(120px 60px at 30% 30%, rgba(255,255,255,.28), transparent 62%),
+      linear-gradient(90deg, rgba(110,90,255,.72), rgba(242,183,5,.82), rgba(233,125,74,.72));
+    box-shadow:0 16px 34px rgba(0,0,0,.18);
+    text-shadow:0 2px 12px rgba(0,0,0,.35);
+    opacity:0;
+    pointer-events:none;
+    z-index:4;
+  }
+  .slot.isCelebrate .jackpotBanner{opacity:1; animation: bannerPop 1.15s cubic-bezier(.16,.84,.18,1) both}
+
+  .slot.isCelebrate .cabinet{
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.45),
+      0 0 0 3px rgba(242,183,5,.20),
+      0 0 0 10px rgba(110,90,255,.10);
+  }
+  .slot.isCelebrate .reelWindow{border-color: rgba(110,90,255,.55)}
+
+  .slot.isCelebrate .machine{animation: shake .18s ease-in-out 0s 4;}
+  @keyframes shake{0%{transform:translate3d(0,0,0)}25%{transform:translate3d(-2px,1px,0)}50%{transform:translate3d(2px,-1px,0)}75%{transform:translate3d(-1px,-2px,0)}100%{transform:translate3d(0,0,0)}}
+  @keyframes bannerPop{0%{transform:translateX(-50%) scale(.82); filter: blur(1px); opacity:0}
+    22%{transform:translateX(-50%) scale(1.08); filter: blur(0); opacity:1}
+    100%{transform:translateX(-50%) scale(1); opacity:1}}
+
 
   .marquee{
     display:flex;
@@ -493,5 +662,8 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
   @media (prefers-reduced-motion: reduce){
     .leverRod, .leverKnob, .reelStrip{transition:none}
     .slot.isSpinning .lamp{animation:none}
+    .slot.isCelebrate .machine{animation:none}
+    .slot.isCelebrate .jackpotBanner{animation:none}
+    .fx{display:none}
   }
 </style>
