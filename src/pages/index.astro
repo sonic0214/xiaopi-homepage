@@ -84,16 +84,24 @@ const capabilityCards = [
       .wrap{max-width:1020px;margin:0 auto;padding:64px 20px 72px;}
 
       /* hero */
-      .hero{display:flex;gap:30px;align-items:center;padding:28px;border-radius:24px;background:var(--card);
-        border:1px solid var(--stroke);box-shadow:var(--shadow);backdrop-filter: blur(10px);}
-      .avatar{width:152px;height:152px;border-radius:28px;object-fit:cover;border:1px solid rgba(0,0,0,.10);
+      .hero{padding:28px;border-radius:24px;background:var(--card);
+        border:1px solid var(--stroke);box-shadow:var(--shadow);backdrop-filter: blur(10px);
+        transition: border-color .16s ease, background .16s ease, box-shadow .16s ease;
+      }
+      .hero:hover{border-color: rgba(242,183,5,.40); background: rgba(255,255,255,.86); box-shadow:0 22px 70px rgba(0,0,0,.10)}
+      .heroTop{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+      .kicker{color:var(--muted);font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+      .heroMain{display:grid;grid-template-columns:1.2fr .8fr;gap:22px;align-items:center}
+      .heroText{min-width:0}
+      h1{margin:0;font-size:44px;letter-spacing:.6px;line-height:1.1}
+      .status{display:inline-flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;}
+      .dot{width:8px;height:8px;border-radius:50%;background:#31c26a;box-shadow:0 0 0 4px rgba(49,194,106,.12)}
+      .tagline{margin:12px 0 0 0;font-size:16px;line-height:1.95;color:#2d2d2d}
+      .subtitle{white-space:pre-line;margin:8px 0 0 0;color:var(--muted);line-height:1.95}
+      .heroMedia{display:flex;justify-content:flex-end}
+      .avatar{width:184px;height:184px;border-radius:28px;object-fit:cover;border:1px solid rgba(0,0,0,.10);
         transition: transform .18s ease, box-shadow .18s ease;}
       .hero:hover .avatar{transform: translateY(-2px); box-shadow:0 18px 55px rgba(0,0,0,.12)}
-      h1{margin:0;font-size:40px;letter-spacing:.6px;}
-      .status{display:inline-flex;align-items:center;gap:10px;margin-top:12px;color:var(--muted);font-size:13px;}
-      .dot{width:8px;height:8px;border-radius:50%;background:#31c26a;box-shadow:0 0 0 4px rgba(49,194,106,.12)}
-      .tagline{margin:10px 0 0 0;font-size:16px;line-height:1.9;color:#2d2d2d}
-      .subtitle{white-space:pre-line;margin:8px 0 0 0;color:var(--muted);line-height:1.9}
 
       /* dividers */
       .divider{height:1px;margin:22px 0;border:none;background:linear-gradient(90deg, transparent, rgba(0,0,0,.12), transparent)}
@@ -133,24 +141,44 @@ const capabilityCards = [
 
       footer{margin-top:16px;color:var(--muted);font-size:12px}
 
-      @media (max-width:920px){.grid{grid-template-columns:repeat(2,1fr)} .time{min-width:96px}}
+      @media (max-width:920px){.grid{grid-template-columns:repeat(2,1fr)} .time{min-width:96px} .heroMain{grid-template-columns:1fr;}
+        .heroMedia{justify-content:flex-start}
+      }
       @media (max-width:640px){
-        .hero{flex-direction:column;align-items:flex-start}
-        .avatar{width:132px;height:132px}
+        .avatar{width:144px;height:144px}
         .grid{grid-template-columns:1fr}
         .time{min-width:72px}
+        h1{font-size:38px}
       }
     </style>
   </head>
   <body>
     <main class="wrap">
-      <section class="hero">
-        <img class="avatar" src={`${base}assets/xiaopi-avatar.png`} alt="小皮" />
-        <div>
-          <h1>{hero.name}</h1>
-          <div class="status"><span class="dot" /> {hero.status}</div>
-          <p class="tagline">{hero.tagline}</p>
-          <p class="subtitle">{hero.subtitle}</p>
+      <section class="hero" aria-label="Hero">
+        <div class="heroTop">
+          <span class="status"><span class="dot" aria-hidden="true" /> {hero.status}</span>
+          <span class="kicker">小皮 · AI 私人助理</span>
+        </div>
+
+        <div class="heroMain">
+          <div class="heroText">
+            <h1>{hero.name}</h1>
+            <p class="tagline">{hero.tagline}</p>
+            <p class="subtitle">{hero.subtitle}</p>
+          </div>
+
+          <div class="heroMedia">
+            <img
+              class="avatar"
+              src={`${base}assets/xiaopi-avatar.png`}
+              alt="小皮"
+              width="304"
+              height="304"
+              loading="eager"
+              decoding="async"
+              onerror="this.onerror=null;this.src='https://sonic0214.github.io/xiaopi-homepage/assets/xiaopi-avatar.png'"
+            />
+          </div>
         </div>
       </section>
 
