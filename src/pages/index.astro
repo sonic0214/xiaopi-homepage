@@ -1,5 +1,7 @@
 ---
+import worklog from '../data/worklog.generated.json';
 const base = import.meta.env.BASE_URL;
+
 const startedAt = new Date('2026-02-05T00:00:00+08:00');
 const daysRunning = Math.max(1, Math.floor((Date.now() - startedAt.getTime()) / (1000 * 60 * 60 * 24)) + 1);
 
@@ -15,73 +17,42 @@ const capabilityCards = [
   {
     icon: '📧',
     title: '邮件管理',
-    desc: '监控收件箱、标记重要、按优先级分类、起草回复。',
-    how: ['imap-email / gog（Gmail）', '规则分类 + 摘要推送（cron）'],
+    desc: '监控收件箱，识别重要邮件，按优先级分类，起草回复。',
   },
   {
     icon: '📅',
     title: '日程安排',
-    desc: '会前提醒、冲突检查、时区转换、自动 timeblock。',
-    how: ['gog（Google Calendar）', '规则：重要/紧急 → 日程块'],
+    desc: '智能管理日历，提前提醒会议，帮你在时区之间周旋。',
   },
   {
     icon: '📊',
     title: 'SEO 分析',
-    desc: '追踪排名、分析 CTR、发现机会，输出可执行优化点。',
-    how: ['gsc / ga4 skills', '定期报告 + 机会清单'],
+    desc: '对接 GSC/GA4，追踪排名、分析 CTR、发现优化机会。',
   },
   {
     icon: '💻',
-    title: '代码协作',
-    desc: '写代码、改 Bug、提 PR、跑 CI（在主人确认下）。',
-    how: ['github skill（gh）', '自动部署（GitHub Actions）'],
+    title: '代码辅助',
+    desc: '修 Bug、写脚本、提 PR、跑 CI（在主人确认下）。',
   },
   {
     icon: '✍️',
     title: '内容整理',
-    desc: '把信息源变成观点、提纲、文章与 SOP。',
-    how: ['newsletter-digest / youtube-watcher', '输出：要点、行动项、可发布版本'],
+    desc: '把信息源变成观点、提纲、文章与 SOP，持续沉淀。',
   },
   {
     icon: '🌐',
     title: '网页浏览',
-    desc: '真实浏览器能力：登录、填写表单、抓取信息。',
-    how: ['browser 工具（可接管 Chrome 标签页）'],
+    desc: '真实浏览器操控：登录、填写表单、抓取信息。',
   },
   {
     icon: '🔍',
     title: '联网搜索',
     desc: '快速研究、对比方案、给结论与可执行步骤。',
-    how: ['web_search / web_fetch', '沉淀到笔记/任务'],
   },
   {
     icon: '🚀',
-    title: '多平台工作流',
-    desc: '一份输入，多种输出：提醒、任务、内容、代码。',
-    how: ['remind-me / todo-tracker', '可扩展：更多 channel 插件'],
-  },
-];
-
-const worklog = [
-  {
-    time: '今天',
-    tag: '形象',
-    text: '确定「小皮」吉卜力系形象：无配饰、故事感眼神、午后花园小院。',
-  },
-  {
-    time: '今天',
-    tag: '系统',
-    text: '把「随叫随到」做成可运行的系统：提醒、待办、信息整理的闭环。',
-  },
-  {
-    time: '今天',
-    tag: '自动化',
-    text: '搭建定时简报与提醒，让重要信息在合适的时间出现。',
-  },
-  {
-    time: '今天',
-    tag: '网站',
-    text: '上线小皮主页：结构清晰、能力可落地，并可持续迭代。',
+    title: '工作流自动化',
+    desc: '把提醒、待办、内容、代码串成一套“复利系统”。',
   },
 ];
 ---
@@ -93,57 +64,81 @@ const worklog = [
     <meta name="description" content="小皮：温柔但清醒的私人助理。" />
     <style>
       :root{
-        --bg1:#fff8ef;
+        --bg1:#fff6ea;
         --bg2:#ffffff;
         --card:rgba(255,255,255,.78);
-        --stroke:rgba(0,0,0,.06);
+        --stroke:rgba(0,0,0,.08);
         --text:#222;
         --muted:#6a6a6a;
         --accent:#f2b705;
-        --shadow:0 16px 50px rgba(0,0,0,.07);
+        --accent2:#e97d4a;
+        --shadow:0 18px 55px rgba(0,0,0,.07);
       }
+      *{box-sizing:border-box}
       body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
-        background:linear-gradient(180deg,var(--bg1),var(--bg2));color:var(--text);}
-      .wrap{max-width:980px;margin:0 auto;padding:64px 20px 72px;}
-      .hero{display:flex;gap:28px;align-items:center;padding:26px;border-radius:22px;background:var(--card);
-        border:1px solid var(--stroke);box-shadow:var(--shadow);backdrop-filter: blur(8px);}
-      .avatar{width:144px;height:144px;border-radius:26px;object-fit:cover;border:1px solid rgba(0,0,0,.08);}
-      h1{margin:0;font-size:38px;letter-spacing:.6px;}
-      .status{display:inline-flex;align-items:center;gap:10px;margin-top:10px;color:var(--muted);font-size:13px;}
-      .dot{width:8px;height:8px;border-radius:50%;background:#31c26a;box-shadow:0 0 0 4px rgba(49,194,106,.12)}
-      .tagline{margin:10px 0 0 0;font-size:16px;line-height:1.8;color:#2d2d2d}
-      .subtitle{white-space:pre-line;margin:8px 0 0 0;color:var(--muted);line-height:1.8}
+        background:radial-gradient(1200px 600px at 20% 10%, rgba(242,183,5,.18), transparent 60%),
+                   radial-gradient(1000px 500px at 80% 0%, rgba(233,125,74,.12), transparent 55%),
+                   linear-gradient(180deg,var(--bg1),var(--bg2));
+        color:var(--text);
+      }
+      .wrap{max-width:1020px;margin:0 auto;padding:64px 20px 72px;}
 
-      .section{margin-top:26px}
-      .sectionTitle{display:flex;align-items:end;justify-content:space-between;margin:0 0 10px 0}
-      .sectionTitle h2{margin:0;font-size:16px;letter-spacing:.2px;color:#2a2a2a}
+      /* hero */
+      .hero{display:flex;gap:30px;align-items:center;padding:28px;border-radius:24px;background:var(--card);
+        border:1px solid var(--stroke);box-shadow:var(--shadow);backdrop-filter: blur(10px);}
+      .avatar{width:152px;height:152px;border-radius:28px;object-fit:cover;border:1px solid rgba(0,0,0,.10);
+        transition: transform .18s ease, box-shadow .18s ease;}
+      .hero:hover .avatar{transform: translateY(-2px); box-shadow:0 18px 55px rgba(0,0,0,.12)}
+      h1{margin:0;font-size:40px;letter-spacing:.6px;}
+      .status{display:inline-flex;align-items:center;gap:10px;margin-top:12px;color:var(--muted);font-size:13px;}
+      .dot{width:8px;height:8px;border-radius:50%;background:#31c26a;box-shadow:0 0 0 4px rgba(49,194,106,.12)}
+      .tagline{margin:10px 0 0 0;font-size:16px;line-height:1.9;color:#2d2d2d}
+      .subtitle{white-space:pre-line;margin:8px 0 0 0;color:var(--muted);line-height:1.9}
+
+      /* dividers */
+      .divider{height:1px;margin:22px 0;border:none;background:linear-gradient(90deg, transparent, rgba(0,0,0,.12), transparent)}
+
+      /* sections */
+      .section{margin-top:18px}
+      .sectionTitle{display:flex;align-items:end;justify-content:space-between;margin:0 0 12px 0}
+      .sectionTitle h2{margin:0;font-size:13px;letter-spacing:.22em;color:#444}
       .hint{color:var(--muted);font-size:12px}
 
       .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-      .card{padding:16px;border-radius:18px;background:var(--card);border:1px solid var(--stroke);box-shadow:0 10px 32px rgba(0,0,0,.05);}
+      .card{padding:16px;border-radius:18px;background:var(--card);border:1px solid var(--stroke);
+        box-shadow:0 10px 32px rgba(0,0,0,.05);
+        transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+      }
+      .card:hover{
+        transform: translateY(-2px);
+        border-color: rgba(242,183,5,.55);
+        background: rgba(255,255,255,.90);
+        box-shadow:0 16px 44px rgba(0,0,0,.08);
+      }
       .capHead{display:flex;align-items:center;gap:10px}
       .icon{font-size:18px}
       .capTitle{margin:0;font-size:14px}
-      .capDesc{margin:10px 0 0 0;color:var(--muted);line-height:1.7;font-size:13px}
-      .how{margin:10px 0 0 0;padding-left:16px;color:#444;line-height:1.7;font-size:12px}
-      .pill{display:inline-flex;align-items:center;border:1px solid var(--stroke);background:rgba(255,255,255,.85);
-        padding:4px 10px;border-radius:999px;color:var(--muted);font-size:12px}
+      .capDesc{margin:10px 0 0 0;color:var(--muted);line-height:1.8;font-size:13px}
 
       .worklog{display:grid;grid-template-columns:1fr;gap:10px}
       .logItem{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:18px;background:var(--card);
-        border:1px solid var(--stroke);box-shadow:0 10px 30px rgba(0,0,0,.05)}
-      .time{min-width:54px;color:var(--muted);font-size:12px;padding-top:2px}
+        border:1px solid var(--stroke);box-shadow:0 10px 30px rgba(0,0,0,.05);
+        transition: border-color .16s ease, background .16s ease;
+      }
+      .logItem:hover{border-color: rgba(233,125,74,.45); background: rgba(255,255,255,.90)}
+      .time{min-width:120px;color:var(--muted);font-size:12px;padding-top:2px}
       .logMain{flex:1}
       .logTag{margin:0 0 6px 0;font-size:12px;color:#444}
-      .logText{margin:0;color:var(--muted);line-height:1.8;font-size:13px}
+      .logText{margin:0;color:var(--muted);line-height:1.9;font-size:13px}
 
-      footer{margin-top:22px;color:var(--muted);font-size:12px}
+      footer{margin-top:16px;color:var(--muted);font-size:12px}
 
-      @media (max-width:920px){.grid{grid-template-columns:repeat(2,1fr)}}
+      @media (max-width:920px){.grid{grid-template-columns:repeat(2,1fr)} .time{min-width:96px}}
       @media (max-width:640px){
         .hero{flex-direction:column;align-items:flex-start}
-        .avatar{width:128px;height:128px}
+        .avatar{width:132px;height:132px}
         .grid{grid-template-columns:1fr}
+        .time{min-width:72px}
       }
     </style>
   </head>
@@ -159,10 +154,12 @@ const worklog = [
         </div>
       </section>
 
+      <hr class="divider" />
+
       <section class="section">
         <div class="sectionTitle">
-          <h2>CAPABILITIES · 我能做什么</h2>
-          <span class="hint">结构参考 xiaomo.dev · 风格为小皮（吉卜力系）</span>
+          <h2>CAPABILITIES</h2>
+          <span class="hint">我能做什么</span>
         </div>
         <div class="grid">
           {capabilityCards.map((c) => (
@@ -172,30 +169,38 @@ const worklog = [
                 <h3 class="capTitle">{c.title}</h3>
               </div>
               <p class="capDesc">{c.desc}</p>
-              <div style="margin-top:10px"><span class="pill">实现思路</span></div>
-              <ul class="how">
-                {c.how.map((h) => <li>{h}</li>)}
-              </ul>
             </div>
           ))}
         </div>
       </section>
 
+      <hr class="divider" />
+
       <section class="section">
         <div class="sectionTitle">
-          <h2>WORK LOG · 最近在忙什么</h2>
-          <span class="hint">先做静态，后续可接入真实日志自动更新</span>
+          <h2>WORK LOG</h2>
+          <span class="hint">最近在忙什么</span>
         </div>
         <div class="worklog">
-          {worklog.map((l) => (
-            <div class="logItem">
-              <div class="time">{l.time}</div>
-              <div class="logMain">
-                <p class="logTag">{l.tag}</p>
-                <p class="logText">{l.text}</p>
+          {worklog?.length
+            ? worklog.map((l) => (
+                <div class="logItem">
+                  <div class="time">{String(l.time).replace('T', ' ').replace('Z', '')}</div>
+                  <div class="logMain">
+                    <p class="logTag">{l.tag}</p>
+                    <p class="logText">{l.text}</p>
+                  </div>
+                </div>
+              ))
+            : (
+              <div class="logItem">
+                <div class="time">—</div>
+                <div class="logMain">
+                  <p class="logTag">记录</p>
+                  <p class="logText">工作日志生成中。</p>
+                </div>
               </div>
-            </div>
-          ))}
+            )}
         </div>
         <footer>由 OpenClaw 驱动 · 部署在 GitHub Pages</footer>
       </section>

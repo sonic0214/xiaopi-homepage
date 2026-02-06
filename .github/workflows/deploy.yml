@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -29,6 +31,9 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile --no-progress
+
+      - name: Generate Work Log
+        run: node scripts/generate_worklog.mjs
 
       - name: Build
         run: yarn build
