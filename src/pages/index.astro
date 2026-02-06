@@ -100,7 +100,7 @@ const capabilityCards = [
         padding:0;border-radius:0;background:transparent;border:none;box-shadow:none;backdrop-filter:none;
       }
 
-      .heroTop{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+      .heroTop{position:relative;display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:18px}
       .status{display:inline-flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;
         padding:6px 10px;border-radius:999px;border:1px solid rgba(0,0,0,.10);background:rgba(255,255,255,.55);
         transition: border-color .16s ease, background .16s ease, color .16s ease;
@@ -109,16 +109,17 @@ const capabilityCards = [
       .dot{width:8px;height:8px;border-radius:50%;background:#31c26a;box-shadow:0 0 0 4px rgba(49,194,106,.12)}
       .kicker{color:#6b6b6b;font-size:12px;letter-spacing:.14em}
 
-      .heroMain{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:34px;align-items:center}
-      /* center the intro block a bit more (like xiaomo.dev) */
-      .heroText{min-width:0;max-width:640px;margin:0 auto;}
+      /* xiaomo.dev-like centered hero layout */
       .heroTop{max-width:860px;margin-left:auto;margin-right:auto;}
-      .heroMain{max-width:860px;margin-left:auto;margin-right:auto;}
-      h1{margin:0;font-size:46px;letter-spacing:.4px;line-height:1.08}
+      .heroMain{position:relative;max-width:860px;margin-left:auto;margin-right:auto;
+        display:grid;grid-template-columns:1fr;gap:18px;align-items:center;justify-items:center;
+      }
+      .heroText{min-width:0;max-width:720px;margin:0 auto;text-align:center;}
+      h1{margin:0;font-size:48px;letter-spacing:.4px;line-height:1.08}
       .tagline{margin:12px 0 0 0;font-size:16px;line-height:1.95;color:#2d2d2d}
       .subtitle{white-space:pre-line;margin:8px 0 0 0;color:var(--muted);line-height:1.95}
 
-      .heroMedia{display:flex;justify-content:flex-end;}
+      .heroMedia{display:flex;justify-content:center;}
       .avatar{width:210px;height:210px;border-radius:34px;object-fit:cover;border:1px solid rgba(0,0,0,.12);
         box-shadow:0 22px 70px rgba(0,0,0,.11);
         transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, filter .18s ease;}
@@ -171,8 +172,7 @@ const capabilityCards = [
 
       footer{margin-top:16px;color:var(--muted);font-size:12px}
 
-      @media (max-width:920px){.grid{grid-template-columns:repeat(2,1fr)} .time{min-width:96px} .heroMain{grid-template-columns:1fr;}
-        .heroMedia{justify-content:flex-start}
+      @media (max-width:920px){.grid{grid-template-columns:repeat(2,1fr)} .time{min-width:96px}
         .heroTop{flex-wrap:wrap;gap:10px}
         .heroTop,.heroMain{max-width:100%}
         .heroText{max-width:100%;margin:0}
