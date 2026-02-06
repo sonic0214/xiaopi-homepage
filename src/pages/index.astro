@@ -2,6 +2,7 @@
 import worklog from '../data/worklog.generated.json';
 import PokeSlot from '../components/PokeSlot.astro';
 const base = import.meta.env.BASE_URL;
+const asset = (p) => `${String(base).replace(/\/$/, '')}/${String(p).replace(/^\//, '')}`;
 
 const startedAt = new Date('2026-02-05T00:00:00+08:00');
 const daysRunning = Math.max(1, Math.floor((Date.now() - startedAt.getTime()) / (1000 * 60 * 60 * 24)) + 1);
@@ -248,7 +249,7 @@ const capabilityCards = [
           <div class="heroMedia">
             <img
               class="avatar"
-              src={`${base}assets/xiaopi-avatar.png`}
+              src={asset('assets/xiaopi-avatar.png')}
               alt="小皮"
               width="304"
               height="304"

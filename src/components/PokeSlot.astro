@@ -1,5 +1,7 @@
 ---
 const id = `poke-slot-${Math.random().toString(16).slice(2)}`;
+const base = import.meta.env.BASE_URL;
+const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).replace(/^\//, '')}`;
 ---
 
 <section class="section" aria-label="Poke Slot">
@@ -8,7 +10,7 @@ const id = `poke-slot-${Math.random().toString(16).slice(2)}`;
     <span class="hint">像素老虎机（轻量 · 点击拉杆开转）</span>
   </div>
 
-  <div class="slot" data-slot id={id}>
+  <div class="slot" data-pokeslot id={id} style={`--sprite-url: url('${asset('assets/pokeslot-sprite.svg')}')`}>
     <div class="machine" role="group" aria-label="宠物小精灵老虎机">
       <div class="marquee" aria-hidden="true">
         <div class="score">SCORE<br /><span>0088</span></div>
@@ -22,13 +24,12 @@ const id = `poke-slot-${Math.random().toString(16).slice(2)}`;
           <div class="reel" data-reel="2"><div class="reelWindow"><div class="reelStrip"></div></div></div>
         </div>
 
-        <div class="lever" aria-hidden="true">
-          <div class="leverRod"></div>
-          <div class="leverKnob"></div>
-        </div>
+        <button class="lever" data-lever type="button" aria-label="拉杆">
+          <div class="leverRod" aria-hidden="true"></div>
+          <div class="leverKnob" aria-hidden="true"></div>
+        </button>
 
         <div class="controls">
-          <button class="slotBtn" data-spin type="button">拉杆</button>
           <div class="slotResult" data-result aria-live="polite"></div>
         </div>
       </div>
@@ -38,19 +39,105 @@ const id = `poke-slot-${Math.random().toString(16).slice(2)}`;
         <span class="lamp"></span><span class="lamp"></span><span class="lamp"></span>
       </div>
 
-      <script type="module" define:vars={{ id }}>
-        const root = document.getElementById(id);
-        const btn = root?.querySelector('[data-spin]');
+      <script type="module">
+        const root = document.getElementById({JSON.stringify(id)});
+        if (!root) throw new Error('pokeslot: root not found');
 
-        let mod;
-        btn?.addEventListener('click', async () => {
-          if (!root || !btn) return;
-          if (!mod) {
-            mod = await import('../scripts/slot-machine.ts');
-            mod.initSlotMachine(root);
+        const ITEMS = [
+          { name: '皮卡丘', s: 0 }, { name: '伊布', s: 1 }, { name: '可达鸭', s: 2 },
+          { name: '妙蛙种子', s: 3 }, { name: '小火龙', s: 4 }, { name: '杰尼龟', s: 5 },
+          { name: '胖丁', s: 6 }, { name: '喵喵', s: 7 }, { name: '卡比兽', s: 8 },
+          { name: '耿鬼', s: 9 }, { name: '鲤鱼王', s: 10 }, { name: '超梦', s: 11 },
+        ];
+
+        const itemH = 56;
+        const reels = Array.from(root.querySelectorAll('[data-reel]'));
+        const lever = root.querySelector('[data-lever]');
+        const result = root.querySelector('[data-result]');
+
+        const setCell = (el, idx) => {
+          const s = ITEMS[idx].s;
+          const x = (s % 6) * 64;
+          const y = Math.floor(s / 6) * 64;
+          el.style.setProperty('--bx', `-${x}px`);
+          el.style.setProperty('--by', `-${y}px`);
+          el.setAttribute('aria-label', ITEMS[idx].name);
+        };
+
+        const buildStrip = (strip) => {
+          strip.innerHTML = '';
+          for (let c = 0; c < 3; c++) {
+            for (let i = 0; i < ITEMS.length; i++) {
+              const cell = document.createElement('div');
+              cell.className = 'reelCell';
+              setCell(cell, i);
+              strip.appendChild(cell);
+            }
           }
-          mod.spinOnce(root);
-        });
+        };
+
+        const setOffset = (strip, px, animate) => {
+          strip.style.transitionDuration = animate ? '780ms' : '0ms';
+          strip.style.transform = `translate3d(0, ${-px}px, 0)`;
+        };
+
+        // init strips
+        for (const reel of reels) {
+          const strip = reel.querySelector('.reelStrip');
+          if (!strip) continue;
+          buildStrip(strip);
+          const cycleH = ITEMS.length * itemH;
+          setOffset(strip, cycleH, false);
+        }
+
+        let busy = false;
+        const pick = () => {
+          const r = Math.random();
+          if (r < 0.05) return 11;
+          if (r < 0.10) return 10;
+          return Math.floor(Math.random() * 10);
+        };
+
+        const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+
+        const spin = async () => {
+          if (busy) return;
+          busy = true;
+          root.classList.add('isSpinning');
+          if (result) result.textContent = '';
+
+          const cycleH = ITEMS.length * itemH;
+          const final = [pick(), pick(), pick()];
+
+          for (let r = 0; r < reels.length; r++) {
+            const strip = reels[r].querySelector('.reelStrip');
+            if (!strip) continue;
+
+            setOffset(strip, cycleH, false);
+            // force reflow
+            strip.offsetHeight;
+
+            const extraTurns = 1 + r;
+            const target = (2 + extraTurns) * cycleH + final[r] * itemH;
+            setOffset(strip, target, true);
+            await sleep(140);
+          }
+
+          await sleep(980);
+          root.classList.remove('isSpinning');
+
+          const names = final.map((i) => ITEMS[i].name);
+          const jackpot = names[0] === names[1] && names[1] === names[2];
+          if (result) result.textContent = jackpot ? `命中！${names[0]} 三连` : `结果：${names[0]} / ${names[1]} / ${names[2]}`;
+
+          root.classList.toggle('isJackpot', jackpot);
+          await sleep(900);
+          root.classList.remove('isJackpot');
+
+          busy = false;
+        };
+
+        lever?.addEventListener('click', spin);
       </script>
     </div>
   </div>
@@ -146,7 +233,7 @@ const id = `poke-slot-${Math.random().toString(16).slice(2)}`;
   /* Sprite icon (SVG) */
   .reelCell{
     --sprite: 0;
-    background-image: url('assets/pokeslot-sprite.svg');
+    background-image: var(--sprite-url);
     background-repeat: no-repeat;
     background-size: 384px 128px;
     background-position: calc(-64px * (var(--sprite) % 6)) calc(-64px * (floor(var(--sprite) / 6)));
@@ -156,24 +243,13 @@ const id = `poke-slot-${Math.random().toString(16).slice(2)}`;
   /* Fallback: use custom properties for x/y set by JS */
   .reelCell{background-position: var(--bx, 0px) var(--by, 0px)}
 
-  .controls{margin-top:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-  .slotBtn{
-    appearance:none;border:1px solid rgba(0,0,0,.16);background:rgba(255,255,255,.74);
-    padding:10px 14px;border-radius:14px;font-weight:700;color:#222;cursor:pointer;
-    transition: transform .12s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
-  }
-  .slotBtn:hover{transform: translateY(-1px);border-color: rgba(242,183,5,.62);background:rgba(255,255,255,.94);
-    box-shadow:0 14px 30px rgba(0,0,0,.07);
-  }
-  .slotBtn:active{transform: translateY(0px) scale(.99)}
-  .slotBtn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-  .slotBtn:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(242,183,5,.18), 0 14px 30px rgba(0,0,0,.07);
-    border-color: rgba(242,183,5,.65);
-  }
+  .controls{margin-top:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:22px}
   .slotResult{color:rgba(0,0,0,.64);font-size:13px;line-height:1.6}
 
   /* Lever */
-  .lever{position:absolute;right:14px;top:16px;width:44px;height:104px;display:flex;align-items:flex-start;justify-content:center}
+  .lever{position:absolute;right:14px;top:16px;width:44px;height:104px;display:flex;align-items:flex-start;justify-content:center;
+    background:transparent;border:none;padding:0;cursor:pointer;}
+  .lever:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(242,183,5,.18);border-radius:16px}
   .leverRod{width:10px;height:72px;border-radius:999px;background:rgba(0,0,0,.14);border:1px solid rgba(0,0,0,.10);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
     transform-origin: top center;
@@ -207,7 +283,7 @@ const id = `poke-slot-${Math.random().toString(16).slice(2)}`;
     .lever{display:none}
   }
   @media (prefers-reduced-motion: reduce){
-    .slotBtn, .leverRod, .leverKnob, .reelStrip{transition:none}
+    .leverRod, .leverKnob, .reelStrip{transition:none}
     .slot.isSpinning .lamp{animation:none}
   }
 </style>
