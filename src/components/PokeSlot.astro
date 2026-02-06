@@ -79,7 +79,8 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
           { name: '超梦', slug: 'mewtwo' },
         ];
 
-        const itemH = 112; // each symbol height (2x)
+        const itemH = parseFloat(getComputedStyle(root).getPropertyValue('--symbolH')) || 128;
+        const iconSize = parseFloat(getComputedStyle(root).getPropertyValue('--iconSize')) || itemH;
 
         const reels = Array.from(root.querySelectorAll('[data-reel]'));
         const lever = root.querySelector('[data-lever]');
@@ -104,16 +105,18 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
           el.style.backgroundImage = `url(${url})`;
           el.style.backgroundRepeat = 'no-repeat';
           el.style.backgroundPosition = 'center';
-          el.style.backgroundSize = '112px 112px';
+          el.style.backgroundSize = `${iconSize}px ${iconSize}px`;
           el.style.imageRendering = 'pixelated';
           el.style.filter = 'drop-shadow(0 6px 10px rgba(0,0,0,.10))';
           el.setAttribute('aria-label', it.name);
         };
 
+        const STRIP_CYCLES = 8;
+        const BASE_CYCLE = 3;
+
         const buildStrip = (strip) => {
           strip.innerHTML = '';
-          const cycles = 8;
-          for (let c = 0; c < cycles; c++) {
+          for (let c = 0; c < STRIP_CYCLES; c++) {
             for (let i = 0; i < ITEMS.length; i++) {
               const cell = document.createElement('div');
               cell.className = 'reelCell';
@@ -128,14 +131,20 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
           strip.style.transform = `translate3d(0, ${-px}px, 0)`;
         };
 
-        // init strips
+        // init strips (randomize initial visible symbols)
         const cycleH = ITEMS.length * itemH;
-        for (const reel of reels) {
-          const strip = reel.querySelector('.reelStrip');
+        const offsets = new Array(reels.length).fill(0);
+        const randIdx = () => Math.floor(Math.random() * ITEMS.length);
+
+        for (let r = 0; r < reels.length; r++) {
+          const strip = reels[r].querySelector('.reelStrip');
           if (!strip) continue;
           buildStrip(strip);
-          // start at a later cycle so we have room to spin
-          setOffset(strip, 2 * cycleH, false);
+
+          // Make the chosen symbol land in the MIDDLE row.
+          const init = randIdx();
+          offsets[r] = BASE_CYCLE * cycleH + init * itemH - itemH;
+          setOffset(strip, offsets[r], false);
         }
 
         let busy = false;
@@ -157,21 +166,37 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
           const final = [pick(), pick(), pick()];
           score += 1;
 
+          const mod = (n) => ((n % cycleH) + cycleH) % cycleH;
+          const endModFor = (idx) => mod(idx * itemH - itemH); // middle row
+
           for (let r = 0; r < reels.length; r++) {
             const strip = reels[r].querySelector('.reelStrip');
             if (!strip) continue;
 
-            setOffset(strip, 2 * cycleH, false);
-            // force reflow
-            strip.offsetHeight;
+            // Animate from current offset to target offset (always forward).
+            const cur = offsets[r] || (BASE_CYCLE * cycleH);
+            const curMod = mod(cur);
+            const endMod = endModFor(final[r]);
+            const delta = (endMod - curMod + cycleH) % cycleH;
 
-            const extraTurns = 2 + r; // stagger + more distance
-            const target = (2 + extraTurns) * cycleH + final[r] * itemH;
+            const extraTurns = 2 + r; // stagger
+            const target = cur + extraTurns * cycleH + delta;
+
             setOffset(strip, target, true);
-            await sleep(160);
+            offsets[r] = target;
+            await sleep(170);
           }
 
           await sleep(980);
+
+          // Normalize offsets back into the strip range (no visual jump because symbols repeat every cycle).
+          for (let r = 0; r < reels.length; r++) {
+            const strip = reels[r].querySelector('.reelStrip');
+            if (!strip) continue;
+            offsets[r] = BASE_CYCLE * cycleH + mod(offsets[r]);
+            setOffset(strip, offsets[r], false);
+          }
+
           root.classList.remove('isSpinning');
 
           const names = final.map((i) => ITEMS[i].name);
@@ -196,7 +221,7 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
 
 <style>
   /* Entire machine is self-contained so styles always apply */
-  .slot{margin-top:4px}
+  .slot{margin-top:4px; --symbolH: 128px; --iconSize: 128px;}
 
   .machine{
     position:relative;
@@ -245,10 +270,10 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
   }
   .score span{display:block;margin-top:6px;font-size:18px;letter-spacing:.12em}
 
-  .reels{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:10px 78px 10px 78px}
+  .reels{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:10px 68px 10px 68px}
 
   .reelWindow{
-    height:336px; /* show 3 symbols, 2x size */
+    height: calc(var(--symbolH) * 3);
     border-radius:16px;
     border:1px solid rgba(0,0,0,.18);
     background:
@@ -278,9 +303,9 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
     will-change: transform;
   }
 
-  /* Each cell is 56px tall, centered */
+  /* Each cell is a symbol slot */
   .slot :global(.reelCell){
-    height:112px;
+    height: var(--symbolH);
     display:flex;
     align-items:center;
     justify-content:center;
@@ -300,7 +325,7 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
   .slotResult{color:rgba(0,0,0,.64);font-size:13px;line-height:1.6}
 
   /* Lever */
-  .lever{position:absolute;right:16px;top:90px;width:54px;height:132px;display:flex;align-items:flex-start;justify-content:center;
+  .lever{position:absolute;right:-10px;top:96px;width:58px;height:140px;display:flex;align-items:flex-start;justify-content:center;
     background:transparent;border:none;padding:0;cursor:pointer;}
   .lever:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(242,183,5,.18);border-radius:16px}
   .leverRod{width:12px;height:92px;border-radius:999px;background:rgba(0,0,0,.14);border:1px solid rgba(0,0,0,.10);
@@ -347,9 +372,8 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
   @keyframes blink{0%{opacity:.45}50%{opacity:1}100%{opacity:.45}}
 
   @media (max-width:640px){
+    .slot{--symbolH: 96px; --iconSize: 96px;}
     .reels{padding:8px 14px}
-    .reelWindow{height:264px}
-    .slot :global(.reelCell){height:88px}
     .lever{display:none}
   }
   @media (prefers-reduced-motion: reduce){
