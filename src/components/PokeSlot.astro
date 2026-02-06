@@ -10,11 +10,11 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
     <span class="hint">像素老虎机（轻量 · 点击拉杆开转）</span>
   </div>
 
-  <div class="slot" data-pokeslot id={id} style={`--base: '${String(base).replace(/\/$/, '')}/'`}>
+  <div class="slot" data-pokeslot id={id} style={`--base: ${String(base).replace(/\/$/, '')}/`}>
     <div class="machine" role="group" aria-label="宠物小精灵老虎机">
       <div class="marquee" aria-hidden="true">
-        <div class="score">SCORE<br /><span>0088</span></div>
-        <div class="score">WIN<br /><span>0000</span></div>
+        <div class="score">SCORE<br /><span data-score>0088</span></div>
+        <div class="score">WIN<br /><span data-win>0000</span></div>
       </div>
 
       <div class="cabinet">
@@ -65,16 +65,29 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
         const reels = Array.from(root.querySelectorAll('[data-reel]'));
         const lever = root.querySelector('[data-lever]');
         const result = root.querySelector('[data-result]');
+        const scoreEl = root.querySelector('[data-score]');
+        const winEl = root.querySelector('[data-win]');
+
+        let score = 88;
+        let win = 0;
+        const pad4 = (n) => String(Math.max(0, n | 0)).padStart(4, '0');
+        const renderScore = () => {
+          if (scoreEl) scoreEl.textContent = pad4(score);
+          if (winEl) winEl.textContent = pad4(win);
+        };
+        renderScore();
 
         const setCell = (el, idx) => {
           const it = ITEMS[idx];
-          el.style.setProperty('--icon', `url(${root.style.getPropertyValue('--base')}assets/pokeslot-icons/${it.slug}.png)`);
+          const basePath = (root.style.getPropertyValue('--base') || '/').trim();
+          el.style.setProperty('--icon', `url(${basePath}assets/pokeslot-icons/${it.slug}.png)`);
           el.setAttribute('aria-label', it.name);
         };
 
         const buildStrip = (strip) => {
           strip.innerHTML = '';
-          for (let c = 0; c < 3; c++) {
+          const cycles = 8;
+          for (let c = 0; c < cycles; c++) {
             for (let i = 0; i < ITEMS.length; i++) {
               const cell = document.createElement('div');
               cell.className = 'reelCell';
@@ -90,12 +103,13 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
         };
 
         // init strips
+        const cycleH = ITEMS.length * itemH;
         for (const reel of reels) {
           const strip = reel.querySelector('.reelStrip');
           if (!strip) continue;
           buildStrip(strip);
-          const cycleH = ITEMS.length * itemH;
-          setOffset(strip, cycleH, false);
+          // start at a later cycle so we have room to spin
+          setOffset(strip, 2 * cycleH, false);
         }
 
         let busy = false;
@@ -114,21 +128,21 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
           root.classList.add('isSpinning');
           if (result) result.textContent = '';
 
-          const cycleH = ITEMS.length * itemH;
           const final = [pick(), pick(), pick()];
+          score += 1;
 
           for (let r = 0; r < reels.length; r++) {
             const strip = reels[r].querySelector('.reelStrip');
             if (!strip) continue;
 
-            setOffset(strip, cycleH, false);
+            setOffset(strip, 2 * cycleH, false);
             // force reflow
             strip.offsetHeight;
 
-            const extraTurns = 1 + r;
+            const extraTurns = 2 + r; // stagger + more distance
             const target = (2 + extraTurns) * cycleH + final[r] * itemH;
             setOffset(strip, target, true);
-            await sleep(140);
+            await sleep(160);
           }
 
           await sleep(980);
@@ -136,7 +150,9 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
 
           const names = final.map((i) => ITEMS[i].name);
           const jackpot = names[0] === names[1] && names[1] === names[2];
-          if (result) result.textContent = jackpot ? `命中！${names[0]} 三连` : `结果：${names[0]} / ${names[1]} / ${names[2]}`;
+          if (jackpot) win += 50;
+          renderScore();
+          if (result) result.textContent = jackpot ? `命中！${names[0]} 三连 (+50)` : `结果：${names[0]} / ${names[1]} / ${names[2]}`;
 
           root.classList.toggle('isJackpot', jackpot);
           await sleep(900);
@@ -244,6 +260,7 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
     background-image: var(--icon);
     background-repeat:no-repeat;
     background-position:center;
+    background-size: 44px 44px;
     image-rendering: pixelated;
   }
 
