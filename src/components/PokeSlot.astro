@@ -85,8 +85,9 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
           el.style.backgroundImage = `url(${url})`;
           el.style.backgroundRepeat = 'no-repeat';
           el.style.backgroundPosition = 'center';
-          el.style.backgroundSize = '44px 44px';
+          el.style.backgroundSize = '56px 56px';
           el.style.imageRendering = 'pixelated';
+          el.style.filter = 'drop-shadow(0 6px 10px rgba(0,0,0,.10))';
           el.setAttribute('aria-label', it.name);
         };
 
@@ -231,7 +232,9 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
     height:168px; /* show 3 symbols */
     border-radius:16px;
     border:1px solid rgba(0,0,0,.18);
-    background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.70));
+    background:
+      radial-gradient(220px 120px at 50% 30%, rgba(242,183,5,.14), transparent 70%),
+      linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.72));
     box-shadow: inset 0 12px 22px rgba(0,0,0,.06);
     overflow:hidden;
     position:relative;
@@ -262,12 +265,10 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
     display:flex;
     align-items:center;
     justify-content:center;
-    --icon: none;
-    background-image: var(--icon);
-    background-repeat:no-repeat;
-    background-position:center;
-    background-size: 44px 44px;
-    image-rendering: pixelated;
+    /* subtle in-cell paper wash so icons feel embedded */
+    background:
+      radial-gradient(38px 20px at 50% 45%, rgba(0,0,0,.05), transparent 70%),
+      radial-gradient(70px 40px at 50% 50%, rgba(255,255,255,.55), transparent 62%);
   }
 
   .controls{margin-top:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:22px}
