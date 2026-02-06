@@ -249,8 +249,40 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
 
           root.classList.remove('isSpinning');
 
-          const names = final.map((i) => ITEMS[i].name);
-          const jackpot = names[0] === names[1] && names[1] === names[2];
+          // Derive the final (middle-line) symbols from the DOM to avoid rare mobile desync
+          // between the planned `final` and the actually rendered stop position.
+          const parseTranslateY = (t) => {
+            if (!t || t === 'none') return 0;
+            const m2d = t.match(/^matrix\(([^)]+)\)$/);
+            if (m2d) {
+              const parts = m2d[1].split(',').map((s) => parseFloat(s.trim()));
+              return parts[5] || 0;
+            }
+            const m3d = t.match(/^matrix3d\(([^)]+)\)$/);
+            if (m3d) {
+              const parts = m3d[1].split(',').map((s) => parseFloat(s.trim()));
+              return parts[13] || 0;
+            }
+            return 0;
+          };
+
+          const slugFromBg = (bg) => {
+            const m = String(bg || '').match(/pokeslot-icons\/(.*?)(?:\.(png|webp|jpg|jpeg)|[\)\"\'])/);
+            return m ? m[1] : null;
+          };
+
+          const midCenter = itemH * 1.5;
+          const middleSlugs = reels.map((reel) => {
+            const strip = reel.querySelector('.reelStrip');
+            if (!strip) return null;
+            const ty = parseTranslateY(getComputedStyle(strip).transform);
+            const k = Math.floor((midCenter - ty) / itemH);
+            const cell = strip.children[k];
+            return cell ? slugFromBg(getComputedStyle(cell).backgroundImage) : null;
+          });
+
+          const middleNames = middleSlugs.map((slug) => ITEMS.find((it) => it.slug === slug)?.name || slug || '');
+          const jackpot = !!middleSlugs[0] && middleSlugs.every((s) => s === middleSlugs[0]);
 
           if (jackpot) {
             winThis = PAYOUT;
@@ -261,8 +293,8 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
           renderScore();
 
           if (result) result.textContent = jackpot
-            ? `命中！${names[0]} 三连 +${winThis}`
-            : `结果：${names[0]} / ${names[1]} / ${names[2]}（未中奖）`;
+            ? `命中！${middleNames[0]} 三连 +${winThis}`
+            : `结果：${middleNames[0]} / ${middleNames[1]} / ${middleNames[2]}（未中奖）`;
 
           root.classList.toggle('isJackpot', jackpot);
           await sleep(900);
