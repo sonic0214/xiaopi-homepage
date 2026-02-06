@@ -1,11 +1,7 @@
 [
   {
-    "time": "2026-02-05T00:00:00+08:00",
+    "time": "2026-02-06",
     "tag": "日报",
-    "text": "工作总结（简版）\n- fix(ci): call astro via node node_modules/astro/astro.js\n- ci: use npm install (work around npm ci bug on runners)\n- fix(ci): ensure dev deps installed; use astro binary in npm scripts\n- fix(ci): use local astro via npx --no-install\n- fix(ci): use npx astro in npm scripts for GitHub Actions\n- init: xiaopi homepage (Astro) + GitHub Pages deploy",
-    "meta": {
-      "mode": "heuristic",
-      "commits": 6
-    }
+    "text": "主页迭代与稳定性\n- 老虎机：中奖动画升级（扫光/粒子/抖动）\n- 新增 SFX 音效开关（默认关闭，记住偏好）\n- iPhone 16 系列移动端对齐优化\n- 修复：中奖文案与实际图标偶发不一致\n- 体验优化：预加载图标，减少停轮卡顿\n\n明日计划\n- Worklog 改为“每日一份总结”（先草稿→审核→发布）\n- 继续精修移动端细节与动效质感"
   }
 ]

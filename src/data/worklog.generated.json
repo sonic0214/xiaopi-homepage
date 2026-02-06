@@ -1,60 +1,7 @@
 [
   {
-    "time": "今天",
-    "tag": "形象",
-    "text": "小皮：吉卜力系温柔电气鼠，故事感眼神，午后花园小院。"
-  },
-  {
-    "time": "2026-02-05T00:00:00+08:00",
+    "time": "2026-02-06",
     "tag": "日报",
-    "text": "工作总结（简版）\n- fix(ci): call astro via node node_modules/astro/astro.js\n- ci: use npm install (work around npm ci bug on runners)\n- fix(ci): ensure dev deps installed; use astro binary in npm scripts\n- fix(ci): use local astro via npx --no-install\n- fix(ci): use npx astro in npm scripts for GitHub Actions\n- init: xiaopi homepage (Astro) + GitHub Pages deploy"
-  },
-  {
-    "time": "2026-02-06T14:13:46+08:00",
-    "tag": "更新",
-    "text": "feat: jackpot celebration FX (canvas burst + banner + shake)",
-    "ref": "4910dcc"
-  },
-  {
-    "time": "2026-02-06T14:06:39+08:00",
-    "tag": "更新",
-    "text": "fix: derive win text from rendered middle row (avoid mobile symbol/name mismatch)",
-    "ref": "f14e58c"
-  },
-  {
-    "time": "2026-02-06T13:59:28+08:00",
-    "tag": "更新",
-    "text": "fix: mobile alignment for iPhone 16 (marquee/cabinet/lever)",
-    "ref": "222e6a0"
-  },
-  {
-    "time": "2026-02-06T13:51:10+08:00",
-    "tag": "更新",
-    "text": "perf: preload/decode icons to reduce end-of-spin jank",
-    "ref": "4c03990"
-  },
-  {
-    "time": "2026-02-06T13:38:45+08:00",
-    "tag": "更新",
-    "text": "feat: slot scoring (credit starts 20, -1 per spin, 20% jackpot, win=this spin)",
-    "ref": "d99922a"
-  },
-  {
-    "time": "2026-02-06T13:21:28+08:00",
-    "tag": "更新",
-    "text": "fix: show lever on mobile (hide side scales, adjust layout)",
-    "ref": "d253032"
-  },
-  {
-    "time": "2026-02-06T13:13:59+08:00",
-    "tag": "更新",
-    "text": "fix: pokeslot center-line result + lever outside + tighter reels + random init",
-    "ref": "17c8900"
-  },
-  {
-    "time": "2026-02-06T12:53:44+08:00",
-    "tag": "更新",
-    "text": "feat: pokeslot bigger symbols (2x) + fuller cabinet layout",
-    "ref": "1b0bf53"
+    "text": "主页迭代与稳定性\n- 老虎机：中奖动画升级（扫光/粒子/抖动）\n- 新增 SFX 音效开关（默认关闭，记住偏好）\n- iPhone 16 系列移动端对齐优化\n- 修复：中奖文案与实际图标偶发不一致\n- 体验优化：预加载图标，减少停轮卡顿\n\n明日计划\n- Worklog 改为“每日一份总结”（先草稿→审核→发布）\n- 继续精修移动端细节与动效质感"
   }
 ]
