@@ -1,9 +1,7 @@
 name: Daily Worklog Summary
 
 on:
-  schedule:
-    # 00:00 Asia/Shanghai (UTC+8) => 16:00 UTC
-    - cron: '0 16 * * *'
+  # Manual only (publish after review)
   workflow_dispatch: {}
 
 permissions:
