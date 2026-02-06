@@ -1,5 +1,6 @@
 ---
 import worklog from '../data/worklog.generated.json';
+import PokeSlot from '../components/PokeSlot.astro';
 const base = import.meta.env.BASE_URL;
 
 const startedAt = new Date('2026-02-05T00:00:00+08:00');
@@ -159,6 +160,49 @@ const capabilityCards = [
       .capTitle{margin:0;font-size:14px}
       .capDesc{margin:10px 0 0 0;color:var(--muted);line-height:1.8;font-size:13px}
 
+      /* poke slot */
+      .slot{margin-top:4px}
+      .slotFrame{padding:16px;border-radius:18px;background:var(--card);border:1px solid var(--stroke);
+        box-shadow:0 10px 32px rgba(0,0,0,.05);
+      }
+      .reels{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+      .reel{height:64px;border-radius:14px;border:1px solid rgba(0,0,0,.12);
+        background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.70));
+        display:flex;align-items:center;justify-content:center;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        letter-spacing:.06em;
+        position:relative;
+        overflow:hidden;
+      }
+      .reel::before{content:"";position:absolute;inset:0;pointer-events:none;
+        background:
+          linear-gradient(180deg, rgba(242,183,5,.12), transparent 45%),
+          linear-gradient(0deg, rgba(233,125,74,.10), transparent 55%);
+        opacity:.9;
+      }
+      .reelText{position:relative;z-index:1;font-size:14px;color:#1f1f1f}
+      .slotMeta{margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+      .slotActions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+      .slotBtn{appearance:none;border:1px solid rgba(0,0,0,.14);background:rgba(255,255,255,.70);
+        padding:10px 14px;border-radius:14px;font-weight:600;color:#222;cursor:pointer;
+        transition: transform .12s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+      }
+      .slotBtn:hover{transform: translateY(-1px);border-color: rgba(242,183,5,.60);background:rgba(255,255,255,.92);
+        box-shadow:0 14px 30px rgba(0,0,0,.07);
+      }
+      .slotBtn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+      .slotBtn:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(242,183,5,.18), 0 14px 30px rgba(0,0,0,.07);
+        border-color: rgba(242,183,5,.65);
+      }
+      .slotResult{color:var(--muted);font-size:13px;line-height:1.6}
+
+      .slot.isSpinning .reel{border-color: rgba(233,125,74,.45)}
+      .slot.isJackpot .reel{border-color: rgba(242,183,5,.75); box-shadow: 0 0 0 4px rgba(242,183,5,.14) inset;}
+
+      @media (prefers-reduced-motion: reduce){
+        .slotBtn, .reel{transition:none}
+      }
+
       .worklog{display:grid;grid-template-columns:1fr;gap:10px}
       .logItem{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:18px;background:var(--card);
         border:1px solid var(--stroke);box-shadow:0 10px 30px rgba(0,0,0,.05);
@@ -236,6 +280,10 @@ const capabilityCards = [
           ))}
         </div>
       </section>
+
+      <hr class="divider" />
+
+      <PokeSlot />
 
       <hr class="divider" />
 

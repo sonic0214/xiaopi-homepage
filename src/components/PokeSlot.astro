@@ -1,0 +1,44 @@
+---
+const id = `poke-slot-${Math.random().toString(16).slice(2)}`;
+---
+
+<section class="section" aria-label="Poke Slot">
+  <div class="sectionTitle">
+    <h2>POKE SLOT</h2>
+    <span class="hint">像素风小老虎机（点了才加载脚本）</span>
+  </div>
+
+  <div class="slot" data-slot id={id}>
+    <div class="slotFrame" role="group" aria-label="宠物小精灵老虎机">
+      <div class="reels" aria-hidden="true">
+        <div class="reel" data-reel="0"><span class="reelText">皮卡丘</span></div>
+        <div class="reel" data-reel="1"><span class="reelText">伊布</span></div>
+        <div class="reel" data-reel="2"><span class="reelText">可达鸭</span></div>
+      </div>
+
+      <div class="slotMeta">
+        <div class="slotActions">
+          <button class="slotBtn" data-spin type="button">拉杆</button>
+          <div class="slotResult" data-result aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      const root = document.getElementById({JSON.stringify(id)});
+      const btn = root?.querySelector('[data-spin]');
+
+      // Lazy-load game logic only on first interaction.
+      let loaded;
+      btn?.addEventListener('click', async () => {
+        if (!loaded) {
+          loaded = import('../scripts/slot-machine.ts').then((m) => {
+            m.initSlotMachine(root);
+            return true;
+          });
+          await loaded;
+        }
+      }, { once: true });
+    </script>
+  </div>
+</section>
