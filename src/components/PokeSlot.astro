@@ -80,7 +80,13 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
         const setCell = (el, idx) => {
           const it = ITEMS[idx];
           const basePath = (root.style.getPropertyValue('--base') || '/').trim();
-          el.style.setProperty('--icon', `url(${basePath}assets/pokeslot-icons/${it.slug}.png)`);
+          const url = `${basePath}assets/pokeslot-icons/${it.slug}.png`;
+          // Inline styles so dynamically-created cells always render (Astro scoped CSS won't match them).
+          el.style.backgroundImage = `url(${url})`;
+          el.style.backgroundRepeat = 'no-repeat';
+          el.style.backgroundPosition = 'center';
+          el.style.backgroundSize = '44px 44px';
+          el.style.imageRendering = 'pixelated';
           el.setAttribute('aria-label', it.name);
         };
 
@@ -251,7 +257,7 @@ const asset = (p: string) => `${String(base).replace(/\/$/, '')}/${String(p).rep
   }
 
   /* Each cell is 56px tall, centered */
-  .reelCell{
+  .slot :global(.reelCell){
     height:56px;
     display:flex;
     align-items:center;
