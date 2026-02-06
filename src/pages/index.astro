@@ -81,7 +81,10 @@ const capabilityCards = [
                    linear-gradient(180deg,var(--bg1),var(--bg2));
         color:var(--text);
       }
-      .wrap{max-width:1020px;margin:0 auto;padding:64px 20px 72px;}
+      .wrap{max-width:1020px;margin:0 auto;padding:0 20px 72px;}
+
+      /* hero should occupy a full screen */
+      .heroScreen{min-height:100vh;display:flex;align-items:center;padding:64px 0 28px;}
 
       /* hero */
       .hero{position:relative; overflow:hidden;
@@ -187,8 +190,9 @@ const capabilityCards = [
   </head>
   <body>
     <main class="wrap">
-      <section class="hero" aria-label="Hero">
-        <div class="heroTop">
+      <section class="heroScreen" aria-label="Hero Screen">
+        <div class="hero" aria-label="Hero">
+          <div class="heroTop">
           <span class="status"><span class="dot" aria-hidden="true" /> {hero.status}</span>
           <span class="kicker">小皮 · AI 私人助理</span>
         </div>
@@ -212,6 +216,7 @@ const capabilityCards = [
               onerror="this.onerror=null;this.src='https://sonic0214.github.io/xiaopi-homepage/assets/xiaopi-avatar.png'"
             />
           </div>
+        </div>
         </div>
       </section>
 
